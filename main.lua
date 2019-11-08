@@ -35,28 +35,31 @@ function Entity:new(pos, dir)
 	end
 	self.lastpos = self.pos
 end
+function Entity:activate()
+	love.window.close()
+end
 function Entity:update(dt)
 	self.lastpos = self.pos
 	self.pos = self.pos + self.dir * self.speed * dt
 	if self.pos.x < self.radius then
 		self.pos.x = self.radius - (self.pos.x - self.radius)
 		self.dir.x = -self.dir.x
-		screen:setShake(1)
+		if self:is(Player) then screen:setShake(1) end
 	end
 	if self.pos.y < self.radius then
 		self.pos.y = self.radius - (self.pos.y - self.radius)
 		self.dir.y = -self.dir.y
-		screen:setShake(1)
+		if self:is(Player) then screen:setShake(1) end
 	end
 	if self.pos.x > 100-self.radius then
 		self.pos.x = 100-self.radius - (self.pos.x - (100-self.radius))
 		self.dir.x = -self.dir.x
-		screen:setShake(1)
+		if self:is(Player) then screen:setShake(1) end
 	end
 	if self.pos.y > 100-self.radius then
 		self.pos.y = 100-self.radius - (self.pos.y - (100-self.radius))
 		self.dir.y = -self.dir.y
-		screen:setShake(1)
+		if self:is(Player) then screen:setShake(1) end
 	end
 end
 function Entity:draw()
@@ -69,6 +72,14 @@ Player.radius = 5
 function Player:new(pos, dir)
 	self.super.new(self, pos, dir)
 	self.lastpos = self.pos
+end
+function Player:update(dt)
+	self.super.update(self, dt)
+	for i, entity in ipairs(zoo) do
+		if not (entity == self) and (entity.pos - self.pos).length < entity.radius+self.radius then
+			entity:activate()
+		end
+	end
 end
 function Player:draw()
 	love.graphics.setColor(Color('#00afd8'))
@@ -86,10 +97,31 @@ function Blob:draw()
 	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 4)
 end
 
-player = Player(Vector(20, 40), Vector(10, 1))
+Coin = Object:extend()
+Coin.radius = 2
+function Coin:new(pos)
+	self.pos = pos
+end
+function Coin:activate()
+	for i, item in ipairs(zoo) do
+		if item == self then
+			zoo[i] = nil
+		end
+	end
+end
+function Coin:update(dt)
+	-- pass
+end
+function Coin:draw()
+	love.graphics.setColor(Color('#00ffff'))
+	love.graphics.circle('fill', self.pos.x, self.pos.y, 2)
+end
+
+player = Player(Vector(20, 40), Vector(-4, 1))
 zoo = {}
 table.insert(zoo, player)
 table.insert(zoo, Blob(Vector(50, 50), Vector(-2, -1)))
+table.insert(zoo, Coin(Vector(80, 30)))
 
 function jump(x, y)
 	player.speed = 200
