@@ -1,113 +1,138 @@
 local Object = require "modules/classic"
 local screen = require "modules/shack"
-local tick = require "modules/tick"
 local flux = require "modules/flux"
 local center = require "modules/center"
 local Vector = require "modules/brinevector"
 local Input = require "modules/Input"
+local Color = require "modules/hex2color"
+local tick = require "modules/tick"
 
-require "entities"
--- init center
 center:setupScreen(100, 100)
-center:setBorders(100, 100, 100, 100)
-center:setMaxWidth(1000)
-center:setMaxHeight(1000)
+center:setBorders(64, 64, 64, 64)
 center:apply()
--- init Input
-input = Input()
-input:bind('w', 'up')
-input:bind('a', 'left')
-input:bind('s', 'down')
-input:bind('d', 'right')
+
+screen:setDimensions(love.graphics.getWidth(), love.graphics.getHeight())
+
+tick.framerate = 60
+
+function love.load(arg)
+    input = Input()
+    input:bind('mouse1', 'click')
+end
+
+slowmode = false
 
 
-zoo = {}
 
--- define entities
 Entity = Object:extend()
-function Entity:new(x, y)
-	self.pos = Vector(x, y)
-	table.insert(zoo, self)
+Entity.speed = 0
+Entity.radius = 0
+function Entity:new(pos, dir)
+	self.pos = pos or Vector()
+	self.dir = dir or Vector()
+	if self.dir then
+		self.dir = self.dir.normalized
+	end
+	self.lastpos = self.pos
 end
-
-Circle = Entity:extend()
-Circle.radius = 4
-Circle.color = {200, 200, 200, 255}
-function Circle:draw()
-	love.graphics.setLineWidth(1)
-	love.graphics.setColor(self.color)
-	love.graphics.circle('line', self.pos.x, self.pos.y, self.radius)
+function Entity:update(dt)
+	self.lastpos = self.pos
+	self.pos = self.pos + self.dir * self.speed * dt
+	if self.pos.x < self.radius then
+		self.pos.x = self.radius - (self.pos.x - self.radius)
+		self.dir.x = -self.dir.x
+		screen:setShake(1)
+	end
+	if self.pos.y < self.radius then
+		self.pos.y = self.radius - (self.pos.y - self.radius)
+		self.dir.y = -self.dir.y
+		screen:setShake(1)
+	end
+	if self.pos.x > 100-self.radius then
+		self.pos.x = 100-self.radius - (self.pos.x - (100-self.radius))
+		self.dir.x = -self.dir.x
+		screen:setShake(1)
+	end
+	if self.pos.y > 100-self.radius then
+		self.pos.y = 100-self.radius - (self.pos.y - (100-self.radius))
+		self.dir.y = -self.dir.y
+		screen:setShake(1)
+	end
 end
-function Circle:update(dt)
-	self.pos = self.pos + Vector(10, 0) * dt
+function Entity:draw()
+	-- pass
 end
 
 Player = Entity:extend()
-Player.radius = 4
-Player.color = {61, 255, 0, 255}
-Player.a = 10
-Player.start_speed = 10
-Player.max_speed = 120
-function Player:new(x, y)
-	Player.super.new(self, x, y)
-	self.velocity = Vector()
+Player.speed = 100
+Player.radius = 5
+function Player:new(pos, dir)
+	self.super.new(self, pos, dir)
+	self.lastpos = self.pos
 end
 function Player:draw()
-	love.graphics.setLineWidth(1)
-	love.graphics.setColor(self.color)
-	love.graphics.circle('line', self.pos.x, self.pos.y, self.radius)
+	love.graphics.setColor(Color('#00afd8'))
+	love.graphics.circle('fill', self.pos.x, self.pos.y, 5)
+	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 5)
+	self.lastpos = self.pos
 end
-function Player:update(dt)
-	local nv = Vector()
-	if input:pressed('up') then
-		nv = Vector(0, -1)
-	elseif input:pressed('left') then
-		nv = Vector(-1, 0)
-	elseif input:pressed('down') then
-		nv = Vector(0, 1)
-	elseif input:pressed('right') then
-		nv = Vector(1, 0)
-	end
-	if (not (nv == Vector())) and
-	   ((self.velocity == Vector()) or (not (nv == self.velocity.normalized))) then
-		self.velocity = nv * self.start_speed
-		print('xxx')
-	end
 
-	self.velocity = self.velocity * (1 + self.a * dt)
-	self.velocity = self.velocity:trim(self.max_speed)
+Blob = Entity:extend()
+Blob.speed = 60
+Blob.radius = 4
+function Blob:draw()
+	love.graphics.setColor(Color('#ffcd00'))
+	love.graphics.circle('fill', self.pos.x, self.pos.y, 4)
+	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 4)
+end
 
-	self.pos = self.pos + self.velocity * dt
-	if self.pos.x < 0 or self.pos.y < 0 or self.pos.x > 99 or self.pos.y > 99 then
-		self.pos = self.pos:clamp(Vector(0, 0), Vector(99, 99))
-		self.velocity = Vector()
-	end
+player = Player(Vector(20, 40), Vector(10, 1))
+zoo = {}
+table.insert(zoo, player)
+table.insert(zoo, Blob(Vector(50, 50), Vector(-2, -1)))
+
+function jump(x, y)
+	player.speed = 200
+	flux.to(player, 4, {speed = 100})
+	player.dir = (Vector(x, y) - player.pos).normalized
 end
 
 
-Circle(10, 10)
-Circle(20, 30)
-Circle(30, 50)
-Player(50, 50)
-
-
-function love.load()
-	
-end
 
 function love.update(dt)
-	for i, item in ipairs(zoo) do
-		item:update(dt)
+	screen:update(tick.dt)
+	flux.update(tick.dt)
+
+	for i, entity in ipairs(zoo) do
+		entity:update(tick.dt)
+	end
+
+	if input:pressed('click') then
+		tick.timescale = 0.4
+		slowmode = true
+	end
+	if input:released('click') then
+		tick.timescale = 1
+		slowmode = false
+		x, y = love.mouse.getPosition()
+		x, y = center:toGame(x, y)
+		jump(x, y)
 	end
 end
 
 function love.draw()
-	center:start()
-	love.graphics.setLineWidth(4)
-	love.graphics.setColor({200, 200, 200, 127})
-	love.graphics.rectangle('line', 2, 2, 97, 97)
-	for i, item in ipairs(zoo) do
-		item:draw()
+    center:start()
+	screen:apply()
+    love.graphics.clear()
+    love.graphics.setLineWidth(1)
+    love.graphics.setColor(Color("#a0d199"))
+    love.graphics.rectangle('line', 0, 0, 100, 100)
+    for i, entity in ipairs(zoo) do
+		entity:draw()
 	end
-	center:finish()
+    center:finish()
+end
+
+function love.resize(x, y)
+	center:resize(x, y)
 end
