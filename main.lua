@@ -23,7 +23,7 @@ end
 slowmode = false
 mana = 100
 jumpmanacost = 20
-manacostpersec = 100
+manacostpersec = 160
 
 
 
@@ -85,7 +85,7 @@ function Player:update(dt)
 	end
 end
 function Player:draw()
-	love.graphics.setColor(Color('#00afd8'))
+	love.graphics.setColor(Color('#ffcc2f'))
 	love.graphics.circle('fill', self.pos.x, self.pos.y, 5)
 	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 5)
 	self.lastpos = self.pos
@@ -95,7 +95,7 @@ Blob = Entity:extend()
 Blob.speed = 60
 Blob.radius = 4
 function Blob:draw()
-	love.graphics.setColor(Color('#ffcd00'))
+	love.graphics.setColor(Color('#e04646'))
 	love.graphics.circle('fill', self.pos.x, self.pos.y, 4)
 	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 4)
 end
@@ -118,7 +118,7 @@ function Coin:update(dt)
 	-- pass
 end
 function Coin:draw()
-	love.graphics.setColor(Color('#00ffff'))
+	love.graphics.setColor(Color('#39eafd'))
 	love.graphics.circle('fill', self.pos.x, self.pos.y, 2)
 end
 
@@ -176,9 +176,9 @@ function love.draw()
 	screen:apply()
     love.graphics.clear()
     love.graphics.setLineWidth(1)
-    love.graphics.setColor(Color('#81a0aa'))
+    love.graphics.setColor(Color('#39eafd'))
     love.graphics.rectangle('fill', 0, -10, mana, 8)
-    love.graphics.setColor(Color("#a0d199"))
+    love.graphics.setColor(Color("#ffffff"))
     love.graphics.rectangle('line', 0, 0, 100, 100)
     love.graphics.rectangle('line', 0, -10, 100, 8)
     for i, entity in ipairs(zoo) do
