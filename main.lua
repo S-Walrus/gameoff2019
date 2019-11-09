@@ -8,7 +8,7 @@ local Color = require "modules/hex2color"
 local tick = require "modules/tick"
 
 center:setupScreen(100, 100)
-center:setBorders(64, 64, 64, 64)
+center:setBorders(100, 60, 60, 60)
 center:apply()
 
 screen:setDimensions(love.graphics.getWidth(), love.graphics.getHeight())
@@ -21,6 +21,9 @@ function love.load(arg)
 end
 
 slowmode = false
+mana = 100
+jumpmanacost = 10
+manacostpersec = 40
 
 
 
@@ -139,11 +142,23 @@ function love.update(dt)
 		entity:update(tick.dt)
 	end
 
-	if input:pressed('click') then
+	if slowmode then
+		mana = mana - manacostpersec * tick.dt
+		if mana < 0 then
+			tick.timescale = 1
+			slowmode = false
+			x, y = love.mouse.getPosition()
+			x, y = center:toGame(x, y)
+			jump(x, y)
+		end
+	end
+
+	if input:pressed('click') and mana >= jumpmanacost then
+		mana = mana - jumpmanacost
 		tick.timescale = 0.4
 		slowmode = true
 	end
-	if input:released('click') then
+	if input:released('click') and slowmode then
 		tick.timescale = 1
 		slowmode = false
 		x, y = love.mouse.getPosition()
@@ -157,8 +172,11 @@ function love.draw()
 	screen:apply()
     love.graphics.clear()
     love.graphics.setLineWidth(1)
+    love.graphics.setColor(Color('#81a0aa'))
+    love.graphics.rectangle('fill', 0, -10, mana, 8)
     love.graphics.setColor(Color("#a0d199"))
     love.graphics.rectangle('line', 0, 0, 100, 100)
+    love.graphics.rectangle('line', 0, -10, 100, 8)
     for i, entity in ipairs(zoo) do
 		entity:draw()
 	end
