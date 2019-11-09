@@ -8,7 +8,9 @@ local Color = require "modules/hex2color"
 local tick = require "modules/tick"
 
 center:setupScreen(100, 100)
-center:setBorders(100, 60, 60, 60)
+center:setMaxRelativeWidth(0.9)
+center:setMaxRelativeHeight(0.9)
+center:setBorders(60, 0, 0, 0)
 center:apply()
 
 screen:setDimensions(love.graphics.getWidth(), love.graphics.getHeight())
@@ -18,12 +20,11 @@ tick.framerate = 60
 function love.load(arg)
     input = Input()
     input:bind('mouse1', 'click')
-end
+    font = love.graphics.newFont("numerals.ttf", 98)
+    love.graphics.setFont(font)
 
-slowmode = false
-mana = 100
-jumpmanacost = 20
-manacostpersec = 160
+    start_new_game()
+end
 
 
 
@@ -37,9 +38,6 @@ function Entity:new(pos, dir)
 		self.dir = self.dir.normalized
 	end
 	self.lastpos = self.pos
-end
-function Entity:activate()
-	love.window.close()
 end
 function Entity:update(dt)
 	self.lastpos = self.pos
@@ -99,6 +97,9 @@ function Blob:draw()
 	love.graphics.circle('fill', self.pos.x, self.pos.y, 4)
 	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 4)
 end
+function Blob:activate()
+	start_new_game()
+end
 
 Coin = Object:extend()
 Coin.radius = 2
@@ -106,7 +107,8 @@ function Coin:new(pos)
 	self.pos = pos
 end
 function Coin:activate()
-	mana = 100
+	score = score + 1
+	mana = math.min(100, mana+40)
 	for i, item in ipairs(zoo) do
 		if item == self then
 			zoo[i] = nil
@@ -122,17 +124,25 @@ function Coin:draw()
 	love.graphics.circle('fill', self.pos.x, self.pos.y, 2)
 end
 
-player = Player(Vector(20, 40), Vector(-4, 1))
-zoo = {}
-table.insert(zoo, player)
-table.insert(zoo, Blob(Vector(50, 50), Vector(-2, -1)))
-table.insert(zoo, Blob(Vector(30, 90), Vector(-2, 7)))
-table.insert(zoo, Blob(Vector(40, 10), Vector(-2, 2)))
-table.insert(zoo, Coin(Vector(80, 30)))
+function start_new_game()
+	slowmode = false
+	mana = 100
+	jumpmanacost = 20
+	manacostpersec = 160
+	score = 0
+
+	player = Player(Vector(20, 40), Vector(-4, 1))
+	zoo = {}
+	table.insert(zoo, player)
+	table.insert(zoo, Blob(Vector(50, 50), Vector(-2, -1)))
+	table.insert(zoo, Blob(Vector(30, 90), Vector(-2, 7)))
+	table.insert(zoo, Blob(Vector(40, 10), Vector(-2, 2)))
+	table.insert(zoo, Coin(Vector(80, 30)))
+end
 
 function jump(x, y)
-	player.speed = 200
-	flux.to(player, 4, {speed = 100})
+	player.speed = 180
+	flux.to(player, 4, {speed = 80})
 	player.dir = (Vector(x, y) - player.pos).normalized
 end
 
@@ -176,6 +186,8 @@ function love.draw()
 	screen:apply()
     love.graphics.clear()
     love.graphics.setLineWidth(1)
+    love.graphics.setColor(Color('#ffffff', 0.2))
+    -- love.graphics.printf(score, 0, 0, 100, 'center')
     love.graphics.setColor(Color('#39eafd'))
     love.graphics.rectangle('fill', 0, -10, mana, 8)
     love.graphics.setColor(Color("#ffffff"))
