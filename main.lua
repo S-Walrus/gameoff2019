@@ -22,8 +22,8 @@ end
 
 slowmode = false
 mana = 100
-jumpmanacost = 10
-manacostpersec = 40
+jumpmanacost = 20
+manacostpersec = 100
 
 
 
@@ -106,11 +106,13 @@ function Coin:new(pos)
 	self.pos = pos
 end
 function Coin:activate()
+	mana = 100
 	for i, item in ipairs(zoo) do
 		if item == self then
 			zoo[i] = nil
 		end
 	end
+	table.insert(zoo, Coin(Vector(love.math.random(100), love.math.random(100))))
 end
 function Coin:update(dt)
 	-- pass
@@ -124,6 +126,8 @@ player = Player(Vector(20, 40), Vector(-4, 1))
 zoo = {}
 table.insert(zoo, player)
 table.insert(zoo, Blob(Vector(50, 50), Vector(-2, -1)))
+table.insert(zoo, Blob(Vector(30, 90), Vector(-2, 7)))
+table.insert(zoo, Blob(Vector(40, 10), Vector(-2, 2)))
 table.insert(zoo, Coin(Vector(80, 30)))
 
 function jump(x, y)
