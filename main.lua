@@ -1,11 +1,14 @@
-local Object = require "modules/classic"
-local screen = require "modules/shack"
-local flux = require "modules/flux"
-local center = require "modules/center"
-local Vector = require "modules/brinevector"
-local Input = require "modules/Input"
-local Color = require "modules/hex2color"
-local tick = require "modules/tick"
+Object = require "modules/classic"
+screen = require "modules/shack"
+flux = require "modules/flux"
+center = require "modules/center"
+Vector = require "modules/brinevector"
+Input = require "modules/Input"
+Color = require "modules/hex2color"
+tick = require "modules/tick"
+moonshine = require 'moonshine'
+
+require "zoo"
 
 center:setupScreen(100, 100)
 center:setMaxRelativeWidth(0.9)
@@ -17,112 +20,20 @@ screen:setDimensions(love.graphics.getWidth(), love.graphics.getHeight())
 
 tick.framerate = 60
 
+bar_width = 100
+
 function love.load(arg)
     input = Input()
     input:bind('mouse1', 'click')
     font = love.graphics.newFont("numerals.ttf", 98)
     love.graphics.setFont(font)
+    effect = moonshine(moonshine.effects.desaturate)
+    active = true
 
     start_new_game()
 end
 
 
-
-Entity = Object:extend()
-Entity.speed = 0
-Entity.radius = 0
-function Entity:new(pos, dir)
-	self.pos = pos or Vector()
-	self.dir = dir or Vector()
-	if self.dir then
-		self.dir = self.dir.normalized
-	end
-	self.lastpos = self.pos
-end
-function Entity:update(dt)
-	self.lastpos = self.pos
-	self.pos = self.pos + self.dir * self.speed * dt
-	if self.pos.x < self.radius then
-		self.pos.x = self.radius - (self.pos.x - self.radius)
-		self.dir.x = -self.dir.x
-		if self:is(Player) then screen:setShake(1) end
-	end
-	if self.pos.y < self.radius then
-		self.pos.y = self.radius - (self.pos.y - self.radius)
-		self.dir.y = -self.dir.y
-		if self:is(Player) then screen:setShake(1) end
-	end
-	if self.pos.x > 100-self.radius then
-		self.pos.x = 100-self.radius - (self.pos.x - (100-self.radius))
-		self.dir.x = -self.dir.x
-		if self:is(Player) then screen:setShake(1) end
-	end
-	if self.pos.y > 100-self.radius then
-		self.pos.y = 100-self.radius - (self.pos.y - (100-self.radius))
-		self.dir.y = -self.dir.y
-		if self:is(Player) then screen:setShake(1) end
-	end
-end
-function Entity:draw()
-	-- pass
-end
-
-Player = Entity:extend()
-Player.speed = 100
-Player.radius = 5
-function Player:new(pos, dir)
-	self.super.new(self, pos, dir)
-	self.lastpos = self.pos
-end
-function Player:update(dt)
-	self.super.update(self, dt)
-	for i, entity in ipairs(zoo) do
-		if not (entity == self) and (entity.pos - self.pos).length < entity.radius+self.radius then
-			entity:activate()
-		end
-	end
-end
-function Player:draw()
-	love.graphics.setColor(Color('#ffcc2f'))
-	love.graphics.circle('fill', self.pos.x, self.pos.y, 5)
-	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 5)
-	self.lastpos = self.pos
-end
-
-Blob = Entity:extend()
-Blob.speed = 60
-Blob.radius = 4
-function Blob:draw()
-	love.graphics.setColor(Color('#e04646'))
-	love.graphics.circle('fill', self.pos.x, self.pos.y, 4)
-	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 4)
-end
-function Blob:activate()
-	start_new_game()
-end
-
-Coin = Object:extend()
-Coin.radius = 2
-function Coin:new(pos)
-	self.pos = pos
-end
-function Coin:activate()
-	score = score + 1
-	mana = math.min(100, mana+40)
-	for i, item in ipairs(zoo) do
-		if item == self then
-			zoo[i] = nil
-		end
-	end
-	table.insert(zoo, Coin(Vector(love.math.random(100), love.math.random(100))))
-end
-function Coin:update(dt)
-	-- pass
-end
-function Coin:draw()
-	love.graphics.setColor(Color('#39eafd'))
-	love.graphics.circle('fill', self.pos.x, self.pos.y, 2)
-end
 
 function start_new_game()
 	slowmode = false
@@ -130,6 +41,7 @@ function start_new_game()
 	jumpmanacost = 20
 	manacostpersec = 160
 	score = 0
+	active = true
 
 	player = Player(Vector(20, 40), Vector(-4, 1))
 	zoo = {}
@@ -152,13 +64,28 @@ function love.update(dt)
 	screen:update(tick.dt)
 	flux.update(tick.dt)
 
-	for i, entity in ipairs(zoo) do
-		entity:update(tick.dt)
-	end
+	if active then
+		for i, entity in ipairs(zoo) do
+			entity:update(tick.dt)
+		end
 
-	if slowmode then
-		mana = mana - manacostpersec * tick.dt
-		if mana < 0 then
+		if slowmode then
+			mana = mana - manacostpersec * tick.dt
+			if mana < 0 then
+				tick.timescale = 1
+				slowmode = false
+				x, y = love.mouse.getPosition()
+				x, y = center:toGame(x, y)
+				jump(x, y)
+			end
+		end
+
+		if input:pressed('click') and mana >= jumpmanacost then
+			mana = mana - jumpmanacost
+			tick.timescale = 0.4
+			slowmode = true
+		end
+		if input:released('click') and slowmode then
 			tick.timescale = 1
 			slowmode = false
 			x, y = love.mouse.getPosition()
@@ -166,37 +93,28 @@ function love.update(dt)
 			jump(x, y)
 		end
 	end
-
-	if input:pressed('click') and mana >= jumpmanacost then
-		mana = mana - jumpmanacost
-		tick.timescale = 0.4
-		slowmode = true
-	end
-	if input:released('click') and slowmode then
-		tick.timescale = 1
-		slowmode = false
-		x, y = love.mouse.getPosition()
-		x, y = center:toGame(x, y)
-		jump(x, y)
-	end
 end
 
-function love.draw()
+function draw()
     center:start()
 	screen:apply()
     love.graphics.clear()
+    for i, entity in ipairs(zoo) do
+		entity:draw()
+	end
     love.graphics.setLineWidth(1)
     love.graphics.setColor(Color('#ffffff', 0.2))
     -- love.graphics.printf(score, 0, 0, 100, 'center')
     love.graphics.setColor(Color('#39eafd'))
-    love.graphics.rectangle('fill', 0, -10, mana, 8)
+    love.graphics.rectangle('fill', 0, -10, mana/100*bar_width, 8)
     love.graphics.setColor(Color("#ffffff"))
     love.graphics.rectangle('line', 0, 0, 100, 100)
-    love.graphics.rectangle('line', 0, -10, 100, 8)
-    for i, entity in ipairs(zoo) do
-		entity:draw()
-	end
+    love.graphics.rectangle('line', 0, -10, bar_width, 8)
     center:finish()
+end
+
+function love.draw()
+	effect(draw)
 end
 
 function love.resize(x, y)
