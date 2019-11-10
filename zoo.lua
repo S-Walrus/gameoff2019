@@ -83,7 +83,6 @@ function Coin:new(pos)
 end
 function Coin:activate()
 	score = score + 1
-	play_effect(Color('ffff00'))
 	mana = math.min(100, mana+40)
 	for i, item in ipairs(zoo) do
 		if item == self then
