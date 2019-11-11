@@ -19,7 +19,10 @@ local shack = {
   shearTarget = { x = 0, y = 0 },
   
   width = love.graphics.getWidth(),
-  height = love.graphics.getHeight()
+  height = love.graphics.getHeight(),
+
+  shake_x = 0,
+  shake_y = 0
 }
 setmetatable(shack, shack)
 
@@ -61,16 +64,24 @@ function shack:apply()
   love.graphics.scale(self.scale.x, self.scale.y)
   love.graphics.translate(-self.width*.5, -self.height*.5)
   
-  love.graphics.translate((math.random()-.5)*self.shaking, (math.random()-.5)*self.shaking)
+  self.shake_x = (math.random()-.5)*self.shaking
+  self.shake_y = (math.random()-.5)*self.shaking
+  love.graphics.translate(self.shake_x, self.shake_y)
   
   love.graphics.shear(self.shear.x*.01, self.shear.y*.01)
   
   return self
 end
 
+function shack:reset()
+  love.graphics.translate(-self.shake_x, -self.shake_y)
+end
+
 --
 
 function shack:setShake(shaking)
+  self.shake_x = 0
+  self.shake_y = 0
   self.shaking = shaking or 0
   return self
 end

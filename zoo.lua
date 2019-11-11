@@ -88,7 +88,8 @@ Coin = Body:extend()
 Coin.radius = 2
 function Coin:activate()
 	score = score + 1
-	mana = math.min(100, mana+40)
+	mana = math.min(max_mana, mana+40)
+	played_indicator = false
 	for i, item in ipairs(zoo) do
 		if item == self then
 			zoo[i] = nil
