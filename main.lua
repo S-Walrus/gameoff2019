@@ -9,6 +9,7 @@ Color = require "modules/hex2color"
 tick = require "modules/tick"
 moonshine = require 'moonshine'
 
+utils = require 'utils'
 require "zoo"
 
 center:setupScreen(100, 100)

@@ -90,11 +90,14 @@ function Coin:activate()
 	score = score + 1
 	mana = math.min(max_mana, mana+40)
 	played_indicator = false
-	for i, item in ipairs(zoo) do
-		if item == self then
-			zoo[i] = nil
-		end
-	end
+	utils.remove(zoo, self)
+	local circle = Circle(self.pos, self.r, Color('#39eafd'), 'line', 0.5, 1)
+	table.insert(zoo, circle)
+	local tmp = {}
+	flux.to(circle, 0.6, {r = 6, opacity = 0})
+		:ease('circout')
+		:oncomplete(function () utils.remove(zoo, circle) end)
+	tmp = {}
 	table.insert(zoo, Coin(Vector(love.math.random(100), love.math.random(100)),
 		Vector(love.math.random(100), love.math.random(100))))
 end
@@ -105,13 +108,17 @@ end
 
 Circle = Entity:extend()
 Circle.radius = 0
-function Circle:new(pos, r, color, type)
+function Circle:new(pos, r, color, type, width, opacity)
 	self.pos = pos or Vector()
 	self.r = r or 0
 	self.color = color or Color('ffffff')
 	self.type = type or 'fill'
+	self.width = width or 1
+	self.opacity = opacity
 end
 function Circle:draw()
+	love.graphics.setLineWidth(self.width)
+	if self.opacity then self.color[4] = self.opacity end
 	love.graphics.setColor(self.color)
 	love.graphics.circle(self.type, self.pos.x, self.pos.y, self.r)
 end
