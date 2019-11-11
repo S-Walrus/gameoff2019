@@ -107,9 +107,11 @@ function love.update(dt)
 
 		if slowmode then
 			mana = mana - manacostpersec * tick.dt
+			if mana <= 0 then jump_to_mouse() end
 		end
 
-		if input:pressed('click') and max_mana > jumpmanacost then
+		if input:pressed('click') and
+				(mana > jumpmanacost or max_mana > 2*jumpmanacost) then
 			mana = mana - jumpmanacost
 			tick.timescale = 0.4
 			slowmode = true
