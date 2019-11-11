@@ -1,7 +1,18 @@
 Entity = Object:extend()
-Entity.speed = 0
-Entity.radius = 0
-function Entity:new(pos, dir)
+function Entity:draw()
+	-- pass
+end
+function Entity:update(dt)
+	-- pass
+end
+function Entity:activate()
+	-- pass
+end
+
+Body = Entity:extend()
+Body.speed = 0
+Body.radius = 0
+function Body:new(pos, dir)
 	self.pos = pos or Vector()
 	self.dir = dir or Vector()
 	if self.dir then
@@ -9,7 +20,7 @@ function Entity:new(pos, dir)
 	end
 	self.lastpos = self.pos
 end
-function Entity:update(dt)
+function Body:update(dt)
 	self.lastpos = self.pos
 	self.pos = self.pos + self.dir * self.speed * dt
 	if self.pos.x < self.radius then
@@ -33,11 +44,8 @@ function Entity:update(dt)
 		if self:is(Player) then screen:setShake(1) end
 	end
 end
-function Entity:draw()
-	-- pass
-end
 
-Player = Entity:extend()
+Player = Body:extend()
 Player.speed = 100
 Player.radius = 5
 function Player:new(pos, dir)
@@ -46,9 +54,9 @@ function Player:new(pos, dir)
 end
 function Player:update(dt)
 	self.super.update(self, dt)
-	for i, entity in ipairs(zoo) do
-		if not (entity == self) and (entity.pos - self.pos).length < entity.radius+self.radius then
-			entity:activate()
+	for i, Body in ipairs(zoo) do
+		if not (Body == self) and (Body.pos - self.pos).length < Body.radius+self.radius then
+			Body:activate()
 		end
 	end
 end
@@ -59,7 +67,7 @@ function Player:draw()
 	self.lastpos = self.pos
 end
 
-Blob = Entity:extend()
+Blob = Body:extend()
 Blob.speed = 60
 Blob.radius = 4
 function Blob:draw()
@@ -76,11 +84,8 @@ function Blob:activate()
 	flux.to(filler, 0.8, {r=100}):ease('quadinout'):oncomplete(start_new_game)
 end
 
-Coin = Object:extend()
+Coin = Body:extend()
 Coin.radius = 2
-function Coin:new(pos)
-	self.pos = pos
-end
 function Coin:activate()
 	score = score + 1
 	mana = math.min(100, mana+40)
@@ -89,17 +94,15 @@ function Coin:activate()
 			zoo[i] = nil
 		end
 	end
-	table.insert(zoo, Coin(Vector(love.math.random(100), love.math.random(100))))
-end
-function Coin:update(dt)
-	-- pass
+	table.insert(zoo, Coin(Vector(love.math.random(100), love.math.random(100)),
+		Vector(love.math.random(100), love.math.random(100))))
 end
 function Coin:draw()
 	love.graphics.setColor(Color('#39eafd'))
 	love.graphics.circle('fill', self.pos.x, self.pos.y, 2)
 end
 
-Circle = Object:extend()
+Circle = Entity:extend()
 Circle.radius = 0
 function Circle:new(pos, r, color, type)
 	self.pos = pos or Vector()
@@ -111,14 +114,8 @@ function Circle:draw()
 	love.graphics.setColor(self.color)
 	love.graphics.circle(self.type, self.pos.x, self.pos.y, self.r)
 end
-function Circle:update(dt)
-	-- pass
-end
-function Circle:activate()
-	-- pass
-end
 
-Rect = Object:extend()
+Rect = Entity:extend()
 Rect.radius = 0
 function Rect:new(pos, size, color, width, type)
 	self.pos = pos or Vector()
@@ -132,10 +129,4 @@ function Rect:draw()
 	love.graphics.setLineWidth(self.width)
 	love.graphics.rectangle(self.type, self.pos.x-self.size.x/2,
 		self.pos.y-self.size.y/2, self.size.x, self.size.y)
-end
-function Rect:update(dt)
-	-- pass
-end
-function Rect:activate()
-	-- pass
 end
