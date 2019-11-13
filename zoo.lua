@@ -81,7 +81,7 @@ function Blob:activate()
 	active = false
 	filler = Circle(player.pos, 0, Color('#e04646'), 'fill')
 	table.insert(zoo, filler)
-	flux.to(filler, 0.8, {r=100}):ease('quadinout'):oncomplete(start_new_game)
+	flux.to(filler, 0.6, {r=80}):ease('circinout')
 end
 
 Coin = Body:extend()
@@ -94,12 +94,14 @@ function Coin:activate()
 	local circle = Circle(self.pos, self.r, Color('#39eafd'), 'line', 0.5, 1)
 	table.insert(zoo, circle)
 	local tmp = {}
-	flux.to(circle, 0.6, {r = 6, opacity = 0})
+	flux.to(circle, 0.8, {r = 6, opacity = 0})
 		:ease('circout')
 		:oncomplete(function () utils.remove(zoo, circle) end)
 	tmp = {}
 	table.insert(zoo, Coin(Vector(love.math.random(100), love.math.random(100)),
-		Vector(love.math.random(100), love.math.random(100))))
+		Vector(love.math.random(90)+5, love.math.random(90)+5)))
+	-- timescale_tween = flux.to(tick, 0.02, {timescale = 0.4}):ease('quadinout')
+	-- 	:after(0.04, {timescale = 1}):ease('quadin')
 end
 function Coin:draw()
 	love.graphics.setColor(Color('#39eafd'))

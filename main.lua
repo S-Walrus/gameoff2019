@@ -1,3 +1,4 @@
+-- import
 Object = require "modules/classic"
 screen = require "modules/shack"
 bar_shack = dofile "modules/shack.lua"
@@ -9,9 +10,18 @@ Color = require "modules/hex2color"
 tick = require "modules/tick"
 moonshine = require 'moonshine'
 
+-- constants
+MANA_COLOR = Color('#39eafd')
+ENEMY_COLOR = Color('#e04646')
+PLAYER_COLOR = Color('#ffcc2f')
+BORDER_COLOR = Color('#ffffff')
+BACKGROUND_COLOR = Color('#000000')
+
+-- in-project extras
 utils = require 'utils'
 require "zoo"
 
+-- set up modules
 center:setupScreen(100, 100)
 center:setMaxRelativeWidth(0.9)
 center:setMaxRelativeHeight(0.9)
@@ -23,19 +33,22 @@ bar_shack:setDimensions(100, 100)
 
 tick.framerate = 60
 
+-- global bariables
+-- gamestate: {n: nothing, r: run (game started), h: home, p: pause}
+gamestate = 'n'
+
 function love.load(arg)
     input = Input()
     input:bind('mouse1', 'click')
-    font = love.graphics.newFont("numerals.ttf", 98)
+    font = love.graphics.newFont("numerals.ttf", 256)
     love.graphics.setFont(font)
     shader = moonshine(moonshine.effects.desaturate)
     active = true
     played_indicator = false
+    timescale_tween = nil
 
     start_new_game()
 end
-
-MANA_COLOR = Color('#39eafd')
 
 
 
@@ -49,21 +62,30 @@ function start_new_game()
 	score = 0
 	active = true
 	bar_color = MANA_COLOR
+	gamestate = 'r'
 
-	player = Player(Vector(20, 40), Vector(-4, 1))
+	player = Player(Vector(50, 50), Vector(0, 0))
 	zoo = {}
 	table.insert(zoo, player)
-	table.insert(zoo, Blob(Vector(50, 50), Vector(-2, -1)))
-	table.insert(zoo, Blob(Vector(30, 90), Vector(-2, 7)))
-	table.insert(zoo, Blob(Vector(40, 10), Vector(-2, 2)))
-	table.insert(zoo, Coin(Vector(80, 30)))
+	table.insert(zoo, Blob(Vector(20, 20), Vector(math.random()-0.5, math.random()-0.5)))
+	table.insert(zoo, Blob(Vector(20, 80), Vector(math.random()-0.5, math.random()-0.5)))
+	table.insert(zoo, Blob(Vector(80, 20), Vector(math.random()-0.5, math.random()-0.5)))
+	table.insert(zoo, Blob(Vector(80, 80), Vector(math.random()-0.5, math.random()-0.5)))
+	table.insert(zoo, Coin(Vector(love.math.random(90)+5, love.math.random(90)+5)))
+end
+
+function set_timescale(x)
+	if timescale_tween then
+		timescale_tween:stop()
+	end
+	tick.timescale = x
 end
 
 function jump_to_mouse()
-	tick.timescale = 1
+	set_timescale(1)
 	slowmode = false
-	x, y = love.mouse.getPosition()
-	x, y = center:toGame(x, y)
+	local x, y = love.mouse.getPosition()
+	local x, y = center:toGame(x, y)
 	jump(x, y)
 end
 
@@ -107,13 +129,13 @@ function love.update(dt)
 
 		if slowmode then
 			mana = mana - manacostpersec * tick.dt
-			if mana <= 0 then jump_to_mouse() end
+			if mana <= 0 and max_mana <= 2*jumpmanacost then jump_to_mouse() end
 		end
 
 		if input:pressed('click') and
 				(mana > jumpmanacost or max_mana > 2*jumpmanacost) then
 			mana = mana - jumpmanacost
-			tick.timescale = 0.4
+			set_timescale(0.4)
 			slowmode = true
 		end
 		if input:released('click') and slowmode then
@@ -128,6 +150,10 @@ function love.update(dt)
 		if mana < 0 and max_mana > 2*jumpmanacost then
 			break_mana()
 		end
+	else
+		if input:pressed('click') then
+			start_new_game()
+		end
 	end
 end
 
@@ -138,11 +164,16 @@ function draw()
     for i, entity in ipairs(zoo) do
 		entity:draw()
 	end
+	-- love.graphics.setColor(Color('#000000'))
+	-- love.graphics.rectangle('fill', -1000, 0, 1000, 100)
+	-- love.graphics.rectangle('fill', 100, 0, 1000, 100)
+	-- love.graphics.rectangle('fill', -1000, -1000, 2000, 1000)
+	-- love.graphics.rectangle('fill', -1000, 100, 2000, 1000)
     love.graphics.setLineWidth(1)
     love.graphics.setColor(Color("#ffffff"))
     love.graphics.rectangle('line', 0, 0, 100, 100)
-    -- love.graphics.setColor(Color('#ffffff', 0.2))
-    -- love.graphics.printf(score, 0, 0, 100, 'center')
+    love.graphics.setColor(Color('#ffffff', 0.2))
+    love.graphics.printf(score, 100, 0, 300, 'left', 0, 0.2)
     love.graphics.push()
     bar_shack:apply()
 	    love.graphics.setColor(bar_color)
