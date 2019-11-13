@@ -10,7 +10,7 @@ function Entity:activate()
 end
 
 Body = Entity:extend()
-Body.speed = 0
+Body.target_speed = 0
 Body.radius = 0
 function Body:new(pos, dir)
 	self.pos = pos or Vector()
@@ -19,6 +19,8 @@ function Body:new(pos, dir)
 		self.dir = self.dir.normalized
 	end
 	self.lastpos = self.pos
+	self.speed = 0
+	flux.to(self, 1, {speed = self.target_speed}):ease('circin')
 end
 function Body:update(dt)
 	self.lastpos = self.pos
@@ -46,7 +48,7 @@ function Body:update(dt)
 end
 
 Player = Body:extend()
-Player.speed = 100
+Player.target_speed = 100
 Player.radius = 5
 function Player:new(pos, dir)
 	self.super.new(self, pos, dir)
@@ -68,7 +70,7 @@ function Player:draw()
 end
 
 Blob = Body:extend()
-Blob.speed = 60
+Blob.target_speed = 60
 Blob.radius = 4
 function Blob:draw()
 	love.graphics.setColor(Color('#e04646'))

@@ -34,8 +34,9 @@ bar_shack:setDimensions(100, 100)
 tick.framerate = 60
 
 -- global bariables
--- gamestate: {n: nothing, r: run (game started), h: home, p: pause}
+-- gamestate: {n: nothing, s: scene, r: run (game started), h: home, p: pause}
 gamestate = 'n'
+game_transparency = 0
 
 function love.load(arg)
     input = Input()
@@ -62,7 +63,7 @@ function start_new_game()
 	score = 0
 	active = true
 	bar_color = MANA_COLOR
-	gamestate = 'r'
+	gamestate = 's'
 
 	player = Player(Vector(50, 50), Vector(0, 0))
 	zoo = {}
@@ -72,6 +73,13 @@ function start_new_game()
 	table.insert(zoo, Blob(Vector(80, 20), Vector(math.random()-0.5, math.random()-0.5)))
 	table.insert(zoo, Blob(Vector(80, 80), Vector(math.random()-0.5, math.random()-0.5)))
 	table.insert(zoo, Coin(Vector(love.math.random(80)+10, love.math.random(80)+10)))
+
+	game_transparency = 1
+	flux.to(_G, 0.8, {game_transparency=0})
+		:ease('sineinout')
+		:oncomplete(function ()
+			gamestate = 'r'
+		end)
 end
 
 function set_timescale(x)
@@ -122,7 +130,7 @@ function love.update(dt)
 	bar_shack:update(tick.dt*2)
 	flux.update(tick.dt)
 
-	if active then
+	if active and gamestate == 'r' then
 		for i, entity in ipairs(zoo) do
 			entity:update(tick.dt)
 		end
@@ -181,6 +189,8 @@ function draw()
 	    love.graphics.setColor(Color("#ffffff"))
 	    love.graphics.rectangle('line', 0, -10, bar_width, 8)
     love.graphics.pop()
+    love.graphics.setColor(Color('000000', game_transparency))
+    love.graphics.rectangle('fill', -1000, -1000, 2000, 2000)
     center:finish()
 end
 
