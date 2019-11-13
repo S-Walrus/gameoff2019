@@ -99,7 +99,7 @@ function Coin:activate()
 		:oncomplete(function () utils.remove(zoo, circle) end)
 	tmp = {}
 	table.insert(zoo, Coin(Vector(love.math.random(100), love.math.random(100)),
-		Vector(love.math.random(90)+5, love.math.random(90)+5)))
+		Vector(love.math.random(80)+10, love.math.random(80)+10)))
 	-- timescale_tween = flux.to(tick, 0.02, {timescale = 0.4}):ease('quadinout')
 	-- 	:after(0.04, {timescale = 1}):ease('quadin')
 end

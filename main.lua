@@ -71,7 +71,7 @@ function start_new_game()
 	table.insert(zoo, Blob(Vector(20, 80), Vector(math.random()-0.5, math.random()-0.5)))
 	table.insert(zoo, Blob(Vector(80, 20), Vector(math.random()-0.5, math.random()-0.5)))
 	table.insert(zoo, Blob(Vector(80, 80), Vector(math.random()-0.5, math.random()-0.5)))
-	table.insert(zoo, Coin(Vector(love.math.random(90)+5, love.math.random(90)+5)))
+	table.insert(zoo, Coin(Vector(love.math.random(80)+10, love.math.random(80)+10)))
 end
 
 function set_timescale(x)
