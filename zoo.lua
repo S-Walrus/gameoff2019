@@ -53,6 +53,8 @@ Player.radius = 5
 function Player:new(pos, dir)
 	self.super.new(self, pos, dir)
 	self.lastpos = self.pos
+	self.history = {}
+	for i=1,4 do table.insert(self.history, self.pos) end
 end
 function Player:update(dt)
 	self.super.update(self, dt)
@@ -61,12 +63,21 @@ function Player:update(dt)
 			Body:activate()
 		end
 	end
+	self:update_history()
 end
 function Player:draw()
+	for i, pos in ipairs(self.history) do
+		love.graphics.setColor(Color('#ffcc2f', i/#self.history * 0.6, true))
+		love.graphics.circle('fill', pos.x, pos.y, 5)
+	end
 	love.graphics.setColor(Color('#ffcc2f'))
 	love.graphics.circle('fill', self.pos.x, self.pos.y, 5)
 	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 5)
 	self.lastpos = self.pos
+end
+function Player:update_history()
+		table.remove(self.history, 1)
+		table.insert(self.history, self.pos)
 end
 
 Blob = Body:extend()
