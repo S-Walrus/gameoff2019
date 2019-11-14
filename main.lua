@@ -37,6 +37,8 @@ tick.framerate = 60
 -- gamestate: {n: nothing, s: scene, r: run (game started), h: home, p: pause}
 gamestate = 'n'
 game_transparency = 0
+music_playing = false
+music = nil
 
 function love.load(arg)
     input = Input()
@@ -80,6 +82,12 @@ function start_new_game()
 		:oncomplete(function ()
 			gamestate = 'r'
 		end)
+
+	if not music_playing then
+		music = love.audio.newSource("sb_neon.mp3", "stream")
+		music:play()
+		music_playing = true
+	end
 end
 
 function set_timescale(x)
@@ -158,11 +166,11 @@ function love.update(dt)
 		if mana < 0 and max_mana > 2*jumpmanacost then
 			break_mana()
 		end
-	else
+	else if gamestate == 'r' then
 		if input:pressed('click') then
 			start_new_game()
 		end
-	end
+	end end
 end
 
 function draw()
