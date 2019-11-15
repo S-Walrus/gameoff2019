@@ -71,9 +71,24 @@ function start_new_game()
 	zoo = {}
 	table.insert(zoo, player)
 	table.insert(zoo, Blob(Vector(20, 20), Vector(math.random()-0.5, math.random()-0.5)))
-	table.insert(zoo, Blob(Vector(20, 80), Vector(math.random()-0.5, math.random()-0.5)))
-	table.insert(zoo, Blob(Vector(80, 20), Vector(math.random()-0.5, math.random()-0.5)))
-	table.insert(zoo, Blob(Vector(80, 80), Vector(math.random()-0.5, math.random()-0.5)))
+	-- table.insert(zoo, Blob(Vector(20, 80), Vector(math.random()-0.5, math.random()-0.5)))
+	-- table.insert(zoo, Blob(Vector(80, 20), Vector(math.random()-0.5, math.random()-0.5)))
+	-- table.insert(zoo, Blob(Vector(80, 80), Vector(math.random()-0.5, math.random()-0.5)))
+	local circle = Circle(Vector(20, 80), 4, Color('#e04646'), 'fill', 0, 1)
+	table.insert(zoo, circle)
+	flux.to(circle, 2, {opacity=0})
+		:ease('quartinout')
+		:oncomplete(function() utils.remove(zoo, circle) end)
+	local circle = Circle(Vector(80, 80), 4, Color('#e04646'), 'fill', 0, 1)
+	table.insert(zoo, circle)
+	flux.to(circle, 2, {opacity=0})
+		:ease('quartinout')
+		:oncomplete(function() utils.remove(zoo, circle) end)
+	local circle = Circle(Vector(80, 20), 4, Color('#e04646'), 'fill', 0, 1)
+	table.insert(zoo, circle)
+	flux.to(circle, 2, {opacity=0})
+		:ease('quartinout')
+		:oncomplete(function() utils.remove(zoo, circle) end)
 	table.insert(zoo, Coin(Vector(love.math.random(80)+10, love.math.random(80)+10)))
 
 	game_transparency = 1
@@ -129,6 +144,17 @@ function indicate_bar(color, interval, count)
 			:oncomplete(function () change_color(color, interval, n - 1) end)
 	end
 	change_color(color, interval, count or 4)
+end
+
+function place_blob(pos)
+	local circle = Circle(pos, 4, Color('#e04646'), 'fill', 0, 0)
+	table.insert(zoo, circle)
+	flux.to(circle, 2, {opacity=1})
+		:ease('quartin')
+		:oncomplete(function ()
+			utils.remove(zoo, circle)
+			table.insert(zoo, Blob(pos, Vector(math.random()-0.5, math.random()-0.5)))
+		end)
 end
 
 

@@ -115,6 +115,13 @@ function Coin:activate()
 		Vector(love.math.random(80)+10, love.math.random(80)+10)))
 	-- timescale_tween = flux.to(tick, 0.02, {timescale = 0.4}):ease('quadinout')
 	-- 	:after(0.04, {timescale = 1}):ease('quadin')
+	if score == 2 then
+		place_blob(Vector(80, 20))
+	elseif score == 8 then
+		place_blob(Vector(20, 80))
+	elseif score == 18 then
+		place_blob(Vector(80, 80))
+	end
 end
 function Coin:draw()
 	love.graphics.setColor(Color('#39eafd'))
