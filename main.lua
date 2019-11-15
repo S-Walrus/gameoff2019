@@ -154,6 +154,11 @@ function place_blob(pos)
 		:oncomplete(function ()
 			utils.remove(zoo, circle)
 			table.insert(zoo, Blob(pos, Vector(math.random()-0.5, math.random()-0.5)))
+			local circle = Circle(pos, 4, Color('#e04646'), 'line', 0.5, 1)
+			table.insert(zoo, circle)
+			flux.to(circle, 1, {r = 6, opacity = 0})
+				:ease('circout')
+				:oncomplete(function () utils.remove(zoo, circle) end)
 		end)
 end
 
