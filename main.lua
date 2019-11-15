@@ -35,22 +35,26 @@ tick.framerate = 60
 
 -- global bariables
 -- gamestate: {n: nothing, s: scene, r: run (game started), h: home, p: pause}
-gamestate = 'n'
+gamestate = 'm'
 game_transparency = 0
 music_playing = false
 music = nil
+drawfield = false
+drawmenu = true
+zoo = {}
 
 function love.load(arg)
     input = Input()
     input:bind('mouse1', 'click')
-    font = love.graphics.newFont("numerals.ttf", 256)
-    love.graphics.setFont(font)
+    numeric_font = love.graphics.newFont("numerals.ttf", 256)
+    header_font = love.graphics.newFont("Spartan.ttf", 256)
+    body_font = love.graphics.newFont("LibreBaskerville-Regular.ttf", 256)
     shader = moonshine(moonshine.effects.desaturate)
     active = true
     played_indicator = false
     timescale_tween = nil
 
-    start_new_game()
+    -- start_new_game()
 end
 
 
@@ -100,6 +104,7 @@ function start_new_game()
 
 	if not music_playing then
 		music = love.audio.newSource("sb_neon.mp3", "stream")
+		music:setLooping(true)
 		music:play()
 		music_playing = true
 	end
@@ -216,20 +221,43 @@ function draw()
 	-- love.graphics.rectangle('fill', 100, 0, 1000, 100)
 	-- love.graphics.rectangle('fill', -1000, -1000, 2000, 1000)
 	-- love.graphics.rectangle('fill', -1000, 100, 2000, 1000)
-    love.graphics.setLineWidth(1)
-    love.graphics.setColor(Color("#ffffff"))
-    love.graphics.rectangle('line', 0, 0, 100, 100)
-    love.graphics.setColor(Color('#ffffff', 0.2))
-    love.graphics.printf(score, 100, 0, 300, 'left', 0, 0.2)
-    love.graphics.push()
-    bar_shack:apply()
-	    love.graphics.setColor(bar_color)
-	    love.graphics.rectangle('fill', 0, -10, mana, 8)
+	if drawfield then
+	    love.graphics.setLineWidth(1)
 	    love.graphics.setColor(Color("#ffffff"))
-	    love.graphics.rectangle('line', 0, -10, bar_width, 8)
-    love.graphics.pop()
-    love.graphics.setColor(Color('000000', game_transparency))
-    love.graphics.rectangle('fill', -1000, -1000, 2000, 2000)
+	    love.graphics.rectangle('line', 0, 0, 100, 100)
+	    love.graphics.setColor(Color('#ffffff', 0.2))
+	    love.graphics.printf(score, 100, 0, 300, 'left', 0, 0.2)
+	    love.graphics.push()
+	    bar_shack:apply()
+		    love.graphics.setColor(bar_color)
+		    love.graphics.rectangle('fill', 0, -10, mana, 8)
+		    love.graphics.setColor(Color("#ffffff"))
+		    love.graphics.rectangle('line', 0, -10, bar_width, 8)
+	    love.graphics.pop()
+	    love.graphics.setColor(Color('000000', game_transparency))
+	    love.graphics.rectangle('fill', -1000, -1000, 2000, 2000)
+	end
+	if drawmenu then
+		love.graphics.setColor(Color('#ffffff'))
+		love.graphics.setFont(header_font)
+		love.graphics.printf("BORDERED", 0, 10, 100 * 20, 'center', 0, 0.05)
+		love.graphics.setFont(body_font)
+		love.graphics.printf("Dive into", 14, 28, 100 * 20/0.75, "left", 0, 0.05*0.75)
+		love.graphics.printf("Music shelf", 14, 41, 100 * 20/0.75, "left", 0, 0.05*0.75)
+		love.graphics.printf("Settings", 14, 54, 100 * 20/0.75, "left", 0, 0.05*0.75)
+		love.graphics.printf("Leave", 14, 67, 100 * 20/0.75, "left", 0, 0.05*0.75)
+		love.graphics.setLineWidth(3)
+		love.graphics.line(92, 52, 92, 84)
+		love.graphics.line(93.5, 84, 60, 84)
+		love.graphics.setColor(Color('#ffcc2f'))
+		love.graphics.circle("fill", 6, 34, 1.5)
+		love.graphics.setColor(Color('#39eafd'))
+		love.graphics.circle("fill", 6, 47, 1.5)
+		love.graphics.setColor(Color('#e04646'))
+		love.graphics.circle("fill", 6, 60, 1.5)
+		love.graphics.setColor(Color('#ffffff', 0.4))
+		love.graphics.circle("fill", 6, 73, 1.5)
+	end
     center:finish()
 end
 
