@@ -9,6 +9,7 @@ Input = require "modules/Input"
 Color = require "modules/hex2color"
 tick = require "modules/tick"
 moonshine = require 'moonshine'
+main_menu = dofile "modules/hover.lua"
 
 -- constants
 MANA_COLOR = Color('#39eafd')
@@ -33,6 +34,20 @@ bar_shack:setDimensions(100, 100)
 
 tick.framerate = 60
 
+main_menu:addArea({14, 28, 86, 40})
+	:onMouseEnter(function () flux.to(zoo[1], 0.1, {r=3}) end)
+	:onMouseLeave(function () flux.to(zoo[1], 0.1, {r=1.5}) end)
+	:onMousePressed(function () start_new_game() end)
+main_menu:addArea({14, 41, 86, 53})
+	:onMouseEnter(function () flux.to(zoo[2], 0.1, {r=3}) end)
+	:onMouseLeave(function () flux.to(zoo[2], 0.1, {r=1.5}) end)
+main_menu:addArea({14, 54, 86, 66})
+	:onMouseEnter(function () flux.to(zoo[3], 0.1, {r=3}) end)
+	:onMouseLeave(function () flux.to(zoo[3], 0.1, {r=1.5}) end)
+main_menu:addArea({14, 67, 86, 79})
+	:onMouseEnter(function () flux.to(zoo[4], 0.1, {r=3}) end)
+	:onMouseLeave(function () flux.to(zoo[4], 0.1, {r=1.5}) end)
+
 -- global bariables
 -- gamestate: {n: nothing, s: scene, r: run (game started), h: home, p: pause}
 gamestate = 'm'
@@ -54,10 +69,22 @@ function love.load(arg)
     played_indicator = false
     timescale_tween = nil
 
+    load_menu()
+
     -- start_new_game()
 end
 
 
+-- IN-GAME FUNCTOIONS
+
+
+function load_menu()
+	zoo = {}
+	table.insert(zoo, Circle(Vector(6, 34), 1.5, Color('#ffde59'), 'fill'))
+	table.insert(zoo, Circle(Vector(6, 47), 1.5, Color('#ff5757'), 'fill'))
+	table.insert(zoo, Circle(Vector(6, 60), 1.5, Color('#5ce1e6'), 'fill'))
+	table.insert(zoo, Circle(Vector(6, 73), 1.5, Color('#737373'), 'fill'))
+end
 
 function start_new_game()
 	slowmode = false
@@ -70,6 +97,8 @@ function start_new_game()
 	active = true
 	bar_color = MANA_COLOR
 	gamestate = 's'
+	drawmenu = false
+	drawfield = true
 
 	player = Player(Vector(50, 50), Vector(0, 0))
 	zoo = {}
@@ -168,11 +197,14 @@ function place_blob(pos)
 end
 
 
+-- CALLBACKS
+
 
 function love.update(dt)
 	screen:update(tick.dt)
 	bar_shack:update(tick.dt*2)
 	flux.update(tick.dt)
+	main_menu:update(center:toGame(love.mouse.getPosition()))
 
 	if active and gamestate == 'r' then
 		for i, entity in ipairs(zoo) do
@@ -249,20 +281,13 @@ function draw()
 		love.graphics.setLineWidth(3)
 		love.graphics.line(92, 52, 92, 84)
 		love.graphics.line(93.5, 84, 60, 84)
-		love.graphics.setColor(Color('#ffcc2f'))
-		love.graphics.circle("fill", 6, 34, 1.5)
-		love.graphics.setColor(Color('#39eafd'))
-		love.graphics.circle("fill", 6, 47, 1.5)
-		love.graphics.setColor(Color('#e04646'))
-		love.graphics.circle("fill", 6, 60, 1.5)
-		love.graphics.setColor(Color('#ffffff', 0.4))
-		love.graphics.circle("fill", 6, 73, 1.5)
 	end
     center:finish()
 end
 
 function love.draw()
-	shader(draw)
+	-- shader(draw)
+	draw()
 end
 
 function love.resize(x, y)
