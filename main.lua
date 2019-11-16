@@ -37,7 +37,15 @@ tick.framerate = 60
 main_menu:addArea({14, 28, 86, 40})
 	:onMouseEnter(function () flux.to(zoo[1], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[1], 0.1, {r=1.5}) end)
-	:onMousePressed(function () start_new_game() end)
+	:onMousePressed(function ()
+		gamestate = 's'
+		flux.to(zoo[1], 0.6, {r=100})
+			:ease('circinout')
+			:after(_G, 0.4, {game_transparency=1})
+			:ease('sineinout')
+			:after({}, 1, {})
+			:oncomplete(start_new_game)
+	end)
 main_menu:addArea({14, 41, 86, 53})
 	:onMouseEnter(function () flux.to(zoo[2], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[2], 0.1, {r=1.5}) end)
@@ -87,6 +95,8 @@ function load_menu()
 end
 
 function start_new_game()
+	utils.stop_tweens()
+
 	slowmode = false
 	bar_width = 100
 	mana = 100
@@ -204,7 +214,7 @@ function love.update(dt)
 	screen:update(tick.dt)
 	bar_shack:update(tick.dt*2)
 	flux.update(tick.dt)
-	main_menu:update(center:toGame(love.mouse.getPosition()))
+	if gamestate == 'm' then main_menu:update(center:toGame(love.mouse.getPosition())) end
 
 	if active and gamestate == 'r' then
 		for i, entity in ipairs(zoo) do
@@ -234,17 +244,33 @@ function love.update(dt)
 		if mana < 0 and max_mana > 2*jumpmanacost then
 			break_mana()
 		end
-	else if gamestate == 'r' then
+	elseif gamestate == 'r' then
 		if input:pressed('click') then
-			start_new_game()
+			gamestate = 's'
+			flux.to(_G, 0.2, {game_transparency=1})
+				:ease('sineinout')
+				:oncomplete(start_new_game)
 		end
-	end end
+	end
 end
 
 function draw()
     center:start()
 	screen:apply()
     love.graphics.clear()
+    if drawmenu then
+		love.graphics.setColor(Color('#ffffff'))
+		love.graphics.setFont(header_font)
+		love.graphics.printf("BORDERED", 0, 10, 100 * 20, 'center', 0, 0.05)
+		love.graphics.setFont(body_font)
+		love.graphics.printf("Dive into", 14, 28, 100 * 20/0.75, "left", 0, 0.05*0.75)
+		love.graphics.printf("Music shelf", 14, 41, 100 * 20/0.75, "left", 0, 0.05*0.75)
+		love.graphics.printf("Settings", 14, 54, 100 * 20/0.75, "left", 0, 0.05*0.75)
+		love.graphics.printf("Leave", 14, 67, 100 * 20/0.75, "left", 0, 0.05*0.75)
+		love.graphics.setLineWidth(3)
+		love.graphics.line(92, 52, 92, 84)
+		love.graphics.line(93.5, 84, 60, 84)
+	end
     for i, entity in ipairs(zoo) do
 		entity:draw()
 	end
@@ -258,6 +284,7 @@ function draw()
 	    love.graphics.setColor(Color("#ffffff"))
 	    love.graphics.rectangle('line', 0, 0, 100, 100)
 	    love.graphics.setColor(Color('#ffffff', 0.2))
+	    love.graphics.setFont(numeric_font)
 	    love.graphics.printf(score, 100, 0, 300, 'left', 0, 0.2)
 	    love.graphics.push()
 	    bar_shack:apply()
@@ -266,22 +293,9 @@ function draw()
 		    love.graphics.setColor(Color("#ffffff"))
 		    love.graphics.rectangle('line', 0, -10, bar_width, 8)
 	    love.graphics.pop()
-	    love.graphics.setColor(Color('000000', game_transparency))
-	    love.graphics.rectangle('fill', -1000, -1000, 2000, 2000)
 	end
-	if drawmenu then
-		love.graphics.setColor(Color('#ffffff'))
-		love.graphics.setFont(header_font)
-		love.graphics.printf("BORDERED", 0, 10, 100 * 20, 'center', 0, 0.05)
-		love.graphics.setFont(body_font)
-		love.graphics.printf("Dive into", 14, 28, 100 * 20/0.75, "left", 0, 0.05*0.75)
-		love.graphics.printf("Music shelf", 14, 41, 100 * 20/0.75, "left", 0, 0.05*0.75)
-		love.graphics.printf("Settings", 14, 54, 100 * 20/0.75, "left", 0, 0.05*0.75)
-		love.graphics.printf("Leave", 14, 67, 100 * 20/0.75, "left", 0, 0.05*0.75)
-		love.graphics.setLineWidth(3)
-		love.graphics.line(92, 52, 92, 84)
-		love.graphics.line(93.5, 84, 60, 84)
-	end
+    love.graphics.setColor(Color('000000', game_transparency))
+    love.graphics.rectangle('fill', -1000, -1000, 2000, 2000)
     center:finish()
 end
 
