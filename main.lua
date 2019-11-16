@@ -57,13 +57,20 @@ main_menu:addArea({14, 67, 86, 79})
 	:onMouseLeave(function () flux.to(zoo[4], 0.1, {r=1.5}) end)
 
 -- global bariables
--- gamestate: {n: nothing, s: scene, r: run (game started), h: home, p: pause}
-gamestate = 'm'
+--[[
+gamestate: {
+	s: scene --DON'T INTERRUPT--,
+	r: run (game started) --GAMEPLAY--,
+	m: menu --UI--
+}
+]]--
+gamestate = 's'
 game_transparency = 0
 music_playing = false
 music = nil
 drawfield = false
-drawmenu = true
+drawmenu = false
+drawlogo = true
 zoo = {}
 
 function love.load(arg)
@@ -72,12 +79,22 @@ function love.load(arg)
     numeric_font = love.graphics.newFont("numerals.ttf", 256)
     header_font = love.graphics.newFont("Spartan.ttf", 256)
     body_font = love.graphics.newFont("LibreBaskerville-Regular.ttf", 256)
+    logo_font = love.graphics.newFont("Oswald-Medium.ttf", 256)
     shader = moonshine(moonshine.effects.desaturate)
     active = true
     played_indicator = false
     timescale_tween = nil
 
-    load_menu()
+    game_transparency = 1
+    flux.to(_G, 0.4, {game_transparency=0})
+    	:ease('sineinout')
+    	:after(0.4, {game_transparency=1})
+    	:ease('sineinout')
+    	:delay(0.2)
+    	:after({}, 0.4, {})
+    	:oncomplete(load_menu)
+
+    -- load_menu()
 
     -- start_new_game()
 end
@@ -87,11 +104,17 @@ end
 
 
 function load_menu()
+	drawfield = false
+	drawmenu = true
+	drawlogo = false
+	gamestate = 'm'
 	zoo = {}
 	table.insert(zoo, Circle(Vector(6, 34), 1.5, Color('#ffde59'), 'fill'))
 	table.insert(zoo, Circle(Vector(6, 47), 1.5, Color('#ff5757'), 'fill'))
 	table.insert(zoo, Circle(Vector(6, 60), 1.5, Color('#5ce1e6'), 'fill'))
 	table.insert(zoo, Circle(Vector(6, 73), 1.5, Color('#737373'), 'fill'))
+	game_transparency = 1
+	flux.to(_G, 0.4, {game_transparency=0}):ease('sineinout')
 end
 
 function start_new_game()
@@ -293,6 +316,11 @@ function draw()
 		    love.graphics.setColor(Color("#ffffff"))
 		    love.graphics.rectangle('line', 0, -10, bar_width, 8)
 	    love.graphics.pop()
+	end
+	if drawlogo then
+		love.graphics.setFont(logo_font)
+		love.graphics.setColor(Color('#ffffff'))
+		love.graphics.printf('swalrus', 0, 38, 100/0.04, "center", 0, 0.04)
 	end
     love.graphics.setColor(Color('000000', game_transparency))
     love.graphics.rectangle('fill', -1000, -1000, 2000, 2000)
