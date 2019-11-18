@@ -119,7 +119,7 @@ function Coin:activate()
 		place_blob(Vector(80, 20))
 	elseif score == 8 then
 		place_blob(Vector(20, 80))
-	elseif score == 18 then
+	elseif score == 30 then
 		place_blob(Vector(80, 80))
 	end
 end

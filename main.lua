@@ -37,7 +37,7 @@ tick.framerate = 60
 main_menu:addArea({14, 28, 86, 40})
 	:onMouseEnter(function () flux.to(zoo[1], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[1], 0.1, {r=1.5}) end)
-	:onMousePressed(function ()
+	:onClick(function ()
 		gamestate = 's'
 		flux.to(zoo[1], 0.6, {r=100})
 			:ease('circinout')
@@ -76,6 +76,7 @@ zoo = {}
 function love.load(arg)
     input = Input()
     input:bind('mouse1', 'click')
+    input:bind('r2', 'power')
     numeric_font = love.graphics.newFont("numerals.ttf", 256)
     header_font = love.graphics.newFont("Spartan.ttf", 256)
     body_font = love.graphics.newFont("LibreBaskerville-Regular.ttf", 256)
@@ -239,7 +240,7 @@ function love.update(dt)
 	flux.update(tick.dt)
 	if gamestate == 'm' then main_menu:update(center:toGame(love.mouse.getPosition())) end
 
-	if active and gamestate == 'r' then
+	if active == true and gamestate == 'r' then
 		for i, entity in ipairs(zoo) do
 			entity:update(tick.dt)
 		end
