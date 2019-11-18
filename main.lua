@@ -85,16 +85,16 @@ function love.load(arg)
     played_indicator = false
     timescale_tween = nil
 
-    game_transparency = 1
-    flux.to(_G, 0.4, {game_transparency=0})
-    	:ease('sineinout')
-    	:after(0.4, {game_transparency=1})
-    	:ease('sineinout')
-    	:delay(0.2)
-    	:after({}, 0.4, {})
-    	:oncomplete(load_menu)
+    -- game_transparency = 1
+    -- flux.to(_G, 0.4, {game_transparency=0})
+    -- 	:ease('sineinout')
+    -- 	:after(0.4, {game_transparency=1})
+    -- 	:ease('sineinout')
+    -- 	:delay(0.2)
+    -- 	:after({}, 0.4, {})
+    -- 	:oncomplete(load_menu)
 
-    -- load_menu()
+    load_menu()
 
     -- start_new_game()
 end
