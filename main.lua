@@ -133,6 +133,7 @@ function start_new_game()
 	gamestate = 's'
 	drawmenu = false
 	drawfield = true
+	set_timescale(1)
 
 	player = Player(Vector(50, 50), Vector(0, 0))
 	zoo = {}
@@ -254,6 +255,8 @@ function love.update(dt)
 				(mana > jumpmanacost or max_mana > 2*jumpmanacost) then
 			mana = mana - jumpmanacost
 			set_timescale(0.4)
+			-- set_timescale(0.5) TODO add effect indicating slowmo
+			-- timescale_tween = flux.to(tick, 0.2, {timescale=0.3})--:ease('quadout')
 			slowmode = true
 		end
 		if input:released('click') and slowmode then
@@ -289,7 +292,7 @@ function draw()
 		love.graphics.setFont(body_font)
 		love.graphics.printf("Dive into", 14, 28, 100 * 20/0.75, "left", 0, 0.05*0.75)
 		love.graphics.printf("Music shelf", 14, 41, 100 * 20/0.75, "left", 0, 0.05*0.75)
-		love.graphics.printf("Settings", 14, 54, 100 * 20/0.75, "left", 0, 0.05*0.75)
+		love.graphics.printf("Credits", 14, 54, 100 * 20/0.75, "left", 0, 0.05*0.75)
 		love.graphics.printf("Leave", 14, 67, 100 * 20/0.75, "left", 0, 0.05*0.75)
 		love.graphics.setLineWidth(3)
 		love.graphics.line(92, 52, 92, 84)
