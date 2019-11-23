@@ -198,10 +198,12 @@ end
 function break_mana()
     bar_shack:setShake(2)
     indicate_bar(Color('#e04646'), 0.2)
+    -- bar_color = MANA_COLOR
 	max_mana = max_mana - jumpmanacost
 	bar_width = max_mana
 	mana = max_mana
 	played_indicator = true
+	-- played_indicator = false
 end
 
 function indicate_bar(color, interval, count)
@@ -264,7 +266,8 @@ function love.update(dt)
 		end
 
 		if mana <= 2 * jumpmanacost and not played_indicator then
-			indicate_bar(Color('#e04646'), 0.1, 3)
+			-- indicate_bar(Color('#e04646'), 0.1, 3)
+			bar_color = ENEMY_COLOR
 			played_indicator = true
 		end
 
