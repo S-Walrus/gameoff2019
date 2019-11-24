@@ -43,7 +43,7 @@ main_menu:addArea({14, 28, 86, 40})
 			:ease('circinout')
 			:after(_G, 0.4, {game_transparency=1})
 			:ease('sineinout')
-			:after({}, 1, {})
+			:after({}, 0.8, {})
 			:oncomplete(start_new_game)
 	end)
 main_menu:addArea({14, 41, 86, 53})
@@ -83,6 +83,7 @@ zoo = {}
 function love.load(arg)
     input = Input()
     input:bind('mouse1', 'click')
+    input:bind('mouse2', 'back')
     input:bind('r2', 'power')
     numeric_font = love.graphics.newFont("numerals.ttf", 256)
     header_font = love.graphics.newFont("Spartan.ttf", 256)
@@ -113,6 +114,7 @@ end
 
 
 function load_credits()
+	utils.stop_tweens()
 	drawtarget = 'credits'
 	gamestate = 'm'
 	zoo = {}
@@ -121,6 +123,7 @@ function load_credits()
 end
 
 function load_menu()
+	utils.stop_tweens()
 	drawtarget = 'menu'
 	gamestate = 'm'
 	zoo = {}
@@ -254,7 +257,23 @@ function love.update(dt)
 	screen:update(tick.dt)
 	bar_shack:update(tick.dt*2)
 	flux.update(tick.dt)
-	if drawtarget == 'menu' then main_menu:update(center:toGame(love.mouse.getPosition())) end
+
+	if not (gamestate == 's') then
+		if drawtarget == 'menu' then main_menu:update(center:toGame(love.mouse.getPosition())) end
+
+		if drawtarget == 'credits' and input:pressed('back') then
+			gamestate = 's'
+			flux.to(_G, 0.2, {game_transparency=1})
+				:ease('sineinout')
+				:oncomplete(load_menu)
+		end
+		if gamestate == 'r' and input:pressed('back') then
+			gamestate = 's'
+			flux.to(_G, 0.2, {game_transparency=1})
+				:ease('sineinout')
+				:oncomplete(load_menu)
+		end
+	end
 
 	if active == true and gamestate == 'r' then
 		for i, entity in ipairs(zoo) do

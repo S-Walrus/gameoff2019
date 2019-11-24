@@ -147,6 +147,7 @@ end
 function flux:update(deltatime)
   for i = #self, 1, -1 do
     local t = self[i]
+    if t == nil then return end
     if t._delay > 0 then
       t._delay = t._delay - deltatime
     else
