@@ -90,11 +90,14 @@ function Blob:draw()
 end
 function Blob:activate()
 	slowmode = false
-	tick.timescale = 1
+	set_timescale(1)
 	active = false
 	filler = Circle(player.pos, 0, Color('#e04646'), 'fill')
 	table.insert(zoo, filler)
-	flux.to(filler, 0.6, {r=80}):ease('circinout')
+	flux.to(filler, 0.6, {r=80})
+		:ease('circinout')
+		:after(_G, 0.2, {center_score_opacity=1})
+		:ease('sineinout')
 end
 
 Coin = Body:extend()

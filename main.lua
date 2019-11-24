@@ -149,6 +149,7 @@ function start_new_game()
 	bar_color = MANA_COLOR
 	gamestate = 's'
 	drawtarget = 'field'
+	center_score_opacity = 0
 	set_timescale(1)
 
 	player = Player(Vector(50, 50), Vector(0, 0))
@@ -359,9 +360,11 @@ function draw()
 	    love.graphics.setLineWidth(1)
 	    love.graphics.setColor(Color("#ffffff"))
 	    love.graphics.rectangle('line', 0, 0, 100, 100)
-	    love.graphics.setColor(Color('#ffffff', 0.2))
 	    love.graphics.setFont(numeric_font)
+	    love.graphics.setColor(Color('#ffffff', 0.2))
 	    love.graphics.printf(score, 100, 0, 300, 'left', 0, 0.2)
+	    -- love.graphics.setColor(Color('#39eafd', center_score_opacity))
+	    -- love.graphics.printf(score, 0, 20, 100/0.2, 'center', 0, 0.2)
 	    love.graphics.push()
 	    bar_shack:apply()
 		    love.graphics.setColor(bar_color)
