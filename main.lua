@@ -52,6 +52,15 @@ main_menu:addArea({14, 41, 86, 53})
 main_menu:addArea({14, 54, 86, 66})
 	:onMouseEnter(function () flux.to(zoo[3], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[3], 0.1, {r=1.5}) end)
+	:onClick(function ()
+		gamestate = 's'
+		flux.to(zoo[3], 0.3, {r=1})
+			:ease('sineout')
+		flux.to(_G, 0.2, {game_transparency=1})
+			:ease('sineinout')
+			:after({}, 0, {})
+			:oncomplete(load_credits)
+		end)
 main_menu:addArea({14, 67, 86, 79})
 	:onMouseEnter(function () flux.to(zoo[4], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[4], 0.1, {r=1.5}) end)
@@ -68,9 +77,7 @@ gamestate = 's'
 game_transparency = 0
 music_playing = false
 music = nil
-drawfield = false
-drawmenu = false
-drawlogo = true
+drawtarget = 'credits'
 zoo = {}
 
 function love.load(arg)
@@ -80,8 +87,9 @@ function love.load(arg)
     numeric_font = love.graphics.newFont("numerals.ttf", 256)
     header_font = love.graphics.newFont("Spartan.ttf", 256)
     body_font = love.graphics.newFont("LibreBaskerville-Regular.ttf", 256)
+    italic_font = love.graphics.newFont("LibreBaskerville-Italic.ttf", 256)
     logo_font = love.graphics.newFont("Oswald-Medium.ttf", 256)
-    shader = moonshine(moonshine.effects.desaturate)
+    shader = moonshine(moonshine.effects.vignette)
     active = true
     played_indicator = false
     timescale_tween = nil
@@ -104,10 +112,16 @@ end
 -- IN-GAME FUNCTOIONS
 
 
+function load_credits()
+	drawtarget = 'credits'
+	gamestate = 'm'
+	zoo = {}
+	game_transparency = 1
+	flux.to(_G, 0.4, {game_transparency=0}):ease('sineinout')
+end
+
 function load_menu()
-	drawfield = false
-	drawmenu = true
-	drawlogo = false
+	drawtarget = 'menu'
 	gamestate = 'm'
 	zoo = {}
 	table.insert(zoo, Circle(Vector(6, 34), 1.5, Color('#ffde59'), 'fill'))
@@ -131,8 +145,7 @@ function start_new_game()
 	active = true
 	bar_color = MANA_COLOR
 	gamestate = 's'
-	drawmenu = false
-	drawfield = true
+	drawtarget = 'field'
 	set_timescale(1)
 
 	player = Player(Vector(50, 50), Vector(0, 0))
@@ -241,7 +254,7 @@ function love.update(dt)
 	screen:update(tick.dt)
 	bar_shack:update(tick.dt*2)
 	flux.update(tick.dt)
-	if gamestate == 'm' then main_menu:update(center:toGame(love.mouse.getPosition())) end
+	if drawtarget == 'menu' then main_menu:update(center:toGame(love.mouse.getPosition())) end
 
 	if active == true and gamestate == 'r' then
 		for i, entity in ipairs(zoo) do
@@ -287,8 +300,8 @@ end
 function draw()
     center:start()
 	screen:apply()
-    love.graphics.clear()
-    if drawmenu then
+    love.graphics.clear(Color('#040404'))
+    if drawtarget == 'menu' then
 		love.graphics.setColor(Color('#ffffff'))
 		love.graphics.setFont(header_font)
 		love.graphics.printf("BORDERED", 0, 10, 100 * 20, 'center', 0, 0.05)
@@ -297,9 +310,23 @@ function draw()
 		love.graphics.printf("Music shelf", 14, 41, 100 * 20/0.75, "left", 0, 0.05*0.75)
 		love.graphics.printf("Credits", 14, 54, 100 * 20/0.75, "left", 0, 0.05*0.75)
 		love.graphics.printf("Leave", 14, 67, 100 * 20/0.75, "left", 0, 0.05*0.75)
-		love.graphics.setLineWidth(3)
-		love.graphics.line(92, 52, 92, 84)
-		love.graphics.line(93.5, 84, 60, 84)
+		-- love.graphics.setLineWidth(3)
+		-- love.graphics.line(92, 52, 92, 84)
+		-- love.graphics.line(93.5, 84, 60, 84)
+	end
+	if drawtarget == 'credits' then
+		love.graphics.setColor(Color('#ffffff'))
+		love.graphics.setFont(body_font)
+		love.graphics.printf("Semyon Entsov", 14, 18, 100*20/0.75, "left", 0, 0.05*0.66)
+		love.graphics.printf("Music by Scott Buckley", 14, 46, 100*20*3, "left", 0, 0.05*0.66)
+		love.graphics.setFont(italic_font)
+		love.graphics.printf("game by", 14, 10, 100*20/0.75, "left", 0, 0.05*0.50)
+		love.graphics.printf("right click to return", 14, 76, 100*20/0.75, "left", 0, 0.05*0.50)
+		love.graphics.setFont(header_font)
+		love.graphics.setColor(Color('#ffde59'))
+		love.graphics.printf("a.k.a. swalrus", 35, 30, 100*20/0.75, "left", 0, 0.05*0.50)
+		love.graphics.setColor(Color('#5ce1e6'))
+		love.graphics.printf("– www.scottbuckley.com.au", 14, 58, 100*20*3, "left", 0, 0.05*0.50)
 	end
     for i, entity in ipairs(zoo) do
 		entity:draw()
@@ -309,7 +336,7 @@ function draw()
 	-- love.graphics.rectangle('fill', 100, 0, 1000, 100)
 	-- love.graphics.rectangle('fill', -1000, -1000, 2000, 1000)
 	-- love.graphics.rectangle('fill', -1000, 100, 2000, 1000)
-	if drawfield then
+	if drawtarget == 'field' then
 	    love.graphics.setLineWidth(1)
 	    love.graphics.setColor(Color("#ffffff"))
 	    love.graphics.rectangle('line', 0, 0, 100, 100)
@@ -324,7 +351,7 @@ function draw()
 		    love.graphics.rectangle('line', 0, -10, bar_width, 8)
 	    love.graphics.pop()
 	end
-	if drawlogo then
+	if drawtarget == 'logo' then
 		love.graphics.setFont(logo_font)
 		love.graphics.setColor(Color('#ffffff'))
 		love.graphics.printf('swalrus', 0, 38, 100/0.04, "center", 0, 0.04)
@@ -341,4 +368,5 @@ end
 
 function love.resize(x, y)
 	center:resize(x, y)
+	shader.resize(x, y)
 end
