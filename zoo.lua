@@ -67,10 +67,10 @@ function Player:update(dt)
 end
 function Player:draw()
 	for i, pos in ipairs(self.history) do
-		love.graphics.setColor(Color('#ffcc2f', i/#self.history * 0.6, true))
+		love.graphics.setColor(Color('#ffde59', i/#self.history * 0.6, true))
 		love.graphics.circle('fill', pos.x, pos.y, 5)
 	end
-	love.graphics.setColor(Color('#ffcc2f'))
+	love.graphics.setColor(Color('#ffde59'))
 	love.graphics.circle('fill', self.pos.x, self.pos.y, 5)
 	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 5)
 	self.lastpos = self.pos
@@ -84,7 +84,7 @@ Blob = Body:extend()
 Blob.target_speed = 60
 Blob.radius = 4
 function Blob:draw()
-	love.graphics.setColor(Color('#e04646'))
+	love.graphics.setColor(Color('#ff5757'))
 	love.graphics.circle('fill', self.pos.x, self.pos.y, 4)
 	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 4)
 end
@@ -92,7 +92,7 @@ function Blob:activate()
 	slowmode = false
 	set_timescale(1)
 	active = false
-	filler = Circle(player.pos, 0, Color('#e04646'), 'fill')
+	filler = Circle(player.pos, 0, Color('#ff5757'), 'fill')
 	table.insert(zoo, filler)
 	flux.to(filler, 0.6, {r=80})
 		:ease('circinout')
@@ -109,7 +109,7 @@ function Coin:activate()
 	played_indicator = false
 	bar_color = MANA_COLOR
 	utils.remove(zoo, self)
-	local circle = Circle(self.pos, self.r, Color('#39eafd'), 'line', 0.5, 1)
+	local circle = Circle(self.pos, self.r, Color('#5ce1e6'), 'line', 0.5, 1)
 	table.insert(zoo, circle)
 	local tmp = {}
 	flux.to(circle, 0.8, {r = 6, opacity = 0})
@@ -129,7 +129,7 @@ function Coin:activate()
 	end
 end
 function Coin:draw()
-	love.graphics.setColor(Color('#39eafd'))
+	love.graphics.setColor(Color('#5ce1e6'))
 	love.graphics.circle('fill', self.pos.x, self.pos.y, 2)
 end
 

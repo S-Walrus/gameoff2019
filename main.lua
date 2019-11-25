@@ -12,9 +12,9 @@ moonshine = require 'moonshine'
 main_menu = dofile "modules/hover.lua"
 
 -- constants
-MANA_COLOR = Color('#39eafd')
-ENEMY_COLOR = Color('#e04646')
-PLAYER_COLOR = Color('#ffcc2f')
+MANA_COLOR = Color('#5ce1e6')
+ENEMY_COLOR = Color('#ff5757')
+PLAYER_COLOR = Color('#ffde59')
 BORDER_COLOR = Color('#ffffff')
 BACKGROUND_COLOR = Color('#000000')
 
@@ -209,17 +209,17 @@ function start_new_game()
 	-- table.insert(zoo, Blob(Vector(20, 80), Vector(math.random()-0.5, math.random()-0.5)))
 	-- table.insert(zoo, Blob(Vector(80, 20), Vector(math.random()-0.5, math.random()-0.5)))
 	-- table.insert(zoo, Blob(Vector(80, 80), Vector(math.random()-0.5, math.random()-0.5)))
-	local circle = Circle(Vector(20, 80), 4, Color('#e04646'), 'fill', 0, 1)
+	local circle = Circle(Vector(20, 80), 4, Color('#ff5757'), 'fill', 0, 1)
 	table.insert(zoo, circle)
 	flux.to(circle, 2, {opacity=0})
 		:ease('quartinout')
 		:oncomplete(function() utils.remove(zoo, circle) end)
-	local circle = Circle(Vector(80, 80), 4, Color('#e04646'), 'fill', 0, 1)
+	local circle = Circle(Vector(80, 80), 4, Color('#ff5757'), 'fill', 0, 1)
 	table.insert(zoo, circle)
 	flux.to(circle, 2, {opacity=0})
 		:ease('quartinout')
 		:oncomplete(function() utils.remove(zoo, circle) end)
-	local circle = Circle(Vector(80, 20), 4, Color('#e04646'), 'fill', 0, 1)
+	local circle = Circle(Vector(80, 20), 4, Color('#ff5757'), 'fill', 0, 1)
 	table.insert(zoo, circle)
 	flux.to(circle, 2, {opacity=0})
 		:ease('quartinout')
@@ -264,7 +264,7 @@ end
 
 function break_mana()
     bar_shack:setShake(2)
-    indicate_bar(Color('#e04646'), 0.2)
+    indicate_bar(Color('#ff5757'), 0.2)
     -- bar_color = MANA_COLOR
 	max_mana = max_mana - jumpmanacost
 	bar_width = max_mana
@@ -285,14 +285,14 @@ function indicate_bar(color, interval, count)
 end
 
 function place_blob(pos)
-	local circle = Circle(pos, 4, Color('#e04646'), 'fill', 0, 0)
+	local circle = Circle(pos, 4, Color('#ff5757'), 'fill', 0, 0)
 	table.insert(zoo, circle)
 	flux.to(circle, 2, {opacity=1})
 		:ease('quartin')
 		:oncomplete(function ()
 			utils.remove(zoo, circle)
 			table.insert(zoo, Blob(pos, Vector(math.random()-0.5, math.random()-0.5)))
-			local circle = Circle(pos, 4, Color('#e04646'), 'line', 0.5, 1)
+			local circle = Circle(pos, 4, Color('#ff5757'), 'line', 0.5, 1)
 			table.insert(zoo, circle)
 			flux.to(circle, 1, {r = 6, opacity = 0})
 				:ease('circout')
@@ -367,7 +367,7 @@ function love.update(dt)
 		end
 
 		if mana <= 2 * jumpmanacost and not played_indicator then
-			-- indicate_bar(Color('#e04646'), 0.1, 3)
+			-- indicate_bar(Color('#ff5757'), 0.1, 3)
 			bar_color = ENEMY_COLOR
 			played_indicator = true
 		end
