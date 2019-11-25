@@ -28,22 +28,22 @@ function Body:update(dt)
 	if self.pos.x < self.radius then
 		self.pos.x = self.radius - (self.pos.x - self.radius)
 		self.dir.x = -self.dir.x
-		if self:is(Player) then screen:setShake(1) end
+		if self:is(Player) then touchBorder() end
 	end
 	if self.pos.y < self.radius then
 		self.pos.y = self.radius - (self.pos.y - self.radius)
 		self.dir.y = -self.dir.y
-		if self:is(Player) then screen:setShake(1) end
+		if self:is(Player) then touchBorder() end
 	end
 	if self.pos.x > 100-self.radius then
 		self.pos.x = 100-self.radius - (self.pos.x - (100-self.radius))
 		self.dir.x = -self.dir.x
-		if self:is(Player) then screen:setShake(1) end
+		if self:is(Player) then touchBorder() end
 	end
 	if self.pos.y > 100-self.radius then
 		self.pos.y = 100-self.radius - (self.pos.y - (100-self.radius))
 		self.dir.y = -self.dir.y
-		if self:is(Player) then screen:setShake(1) end
+		if self:is(Player) then touchBorder() end
 	end
 end
 
@@ -115,8 +115,8 @@ function Coin:activate()
 		:ease('circout')
 		:oncomplete(function () utils.remove(zoo, circle) end)
 	tmp = {}
-	table.insert(zoo, Coin(Vector(love.math.random(100), love.math.random(100)),
-		Vector(love.math.random(80)+10, love.math.random(80)+10)))
+	table.insert(zoo, Coin(Vector(love.math.random(90)+5, love.math.random(90)+5),
+		Vector(0, 0)))
 	-- timescale_tween = flux.to(tick, 0.02, {timescale = 0.4}):ease('quadinout')
 	-- 	:after(0.04, {timescale = 1}):ease('quadin')
 	if score == 2 then

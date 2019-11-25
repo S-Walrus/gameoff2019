@@ -77,7 +77,7 @@ gamestate = 's'
 game_transparency = 0
 music_playing = false
 music = nil
-drawtarget = 'credits'
+drawtarget = 'tutorial'
 zoo = {}
 
 function love.load(arg)
@@ -104,7 +104,7 @@ function love.load(arg)
     -- 	:after({}, 0.4, {})
     -- 	:oncomplete(load_menu)
 
-    load_menu()
+    start_tutorial()
 
     -- start_new_game()
 end
@@ -112,6 +112,38 @@ end
 
 -- IN-GAME FUNCTOIONS
 
+
+function start_tutorial()
+	utils.stop_tweens()
+
+	slowmode = false
+	bar_width = 100
+	mana = 100
+	max_mana = 100
+	jumpmanacost = 20
+	manacostpersec = 160
+	score = 0
+	active = true
+	bar_color = MANA_COLOR
+	gamestate = 's'
+	drawtarget = 'tutorial'
+	center_score_opacity = 0
+	set_timescale(1)
+
+	player = Player(Vector(50, 50), Vector(0, 0))
+	zoo = {}
+	table.insert(zoo, player)
+	-- table.insert(zoo, Blob(Vector(20, 80), Vector(math.random()-0.5, math.random()-0.5)))
+	-- table.insert(zoo, Blob(Vector(80, 20), Vector(math.random()-0.5, math.random()-0.5)))
+	-- table.insert(zoo, Blob(Vector(80, 80), Vector(math.random()-0.5, math.random()-0.5)))
+
+	game_transparency = 1
+	flux.to(_G, 0.8, {game_transparency=0})
+		:ease('sineinout')
+		:oncomplete(function ()
+			gamestate = 'r'
+		end)
+end
 
 function load_credits()
 	utils.stop_tweens()
@@ -248,6 +280,24 @@ function place_blob(pos)
 				:ease('circout')
 				:oncomplete(function () utils.remove(zoo, circle) end)
 		end)
+end
+
+function touchBorder()
+	screen:setShake(1)
+	if drawtarget == 'tutorial' then
+		drawtarget = 'field'
+		flux.to({}, 4, {})
+			:oncomplete(function ()
+				local circle = Circle(Vector(50, 50), 2, PLAYER_COLOR, 'line', 0.5, 1)
+				table.insert(zoo, circle)
+				local tmp = {}
+				flux.to(circle, 0.8, {r = 6, opacity = 0})
+					:ease('circout')
+					:oncomplete(function () utils.remove(zoo, circle) end)
+				tmp = {}
+				table.insert(zoo, Coin(Vector(50, 50), Vector(0, 0)))
+			end)
+	end
 end
 
 
