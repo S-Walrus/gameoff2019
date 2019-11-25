@@ -98,6 +98,7 @@ function Blob:activate()
 		:ease('circinout')
 		:after(_G, 0.2, {center_score_opacity=1})
 		:ease('sineinout')
+		:after(_G, 0.2, {center_score_opacity=1})
 end
 
 Coin = Body:extend()

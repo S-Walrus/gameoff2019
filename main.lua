@@ -90,6 +90,10 @@ function love.load(arg)
     body_font = love.graphics.newFont("LibreBaskerville-Regular.ttf", 256)
     italic_font = love.graphics.newFont("LibreBaskerville-Italic.ttf", 256)
     logo_font = love.graphics.newFont("Oswald-Medium.ttf", 256)
+    lmb_img = love.graphics.newImage("1.png")
+    rmb_img = love.graphics.newImage("2.png")
+    mouse_img = love.graphics.newImage("3.png")
+    love_logo = love.graphics.newImage("love.jpg")
     shader = moonshine(moonshine.effects.vignette)
     active = true
     played_indicator = false
@@ -104,7 +108,7 @@ function love.load(arg)
     -- 	:after({}, 0.4, {})
     -- 	:oncomplete(load_menu)
 
-    start_tutorial()
+    load_welcome()
 
     -- start_new_game()
 end
@@ -143,6 +147,20 @@ function start_tutorial()
 		:oncomplete(function ()
 			gamestate = 'r'
 		end)
+end
+
+function load_welcome()
+	utils.stop_tweens()
+	drawtarget = 'welcome'
+	gamestate = 'm'
+	zoo = {}
+	game_transparency = 1
+	flux.to(_G, 0.4, {game_transparency=0})
+		:ease('sineinout')
+		:after({}, 1, {})
+		:after(_G, 0.4, {game_transparency=1})
+		:after({}, 0.8, {})
+		:oncomplete(start_tutorial)
 end
 
 function load_credits()
@@ -286,7 +304,7 @@ function touchBorder()
 	screen:setShake(1)
 	if drawtarget == 'tutorial' then
 		drawtarget = 'field'
-		flux.to({}, 4, {})
+		flux.to({}, 1, {})
 			:oncomplete(function ()
 				local circle = Circle(Vector(50, 50), 2, PLAYER_COLOR, 'line', 0.5, 1)
 				table.insert(zoo, circle)
@@ -398,6 +416,16 @@ function draw()
 		love.graphics.setColor(Color('#5ce1e6'))
 		love.graphics.printf("– www.scottbuckley.com.au", 14, 58, 100*20*3, "left", 0, 0.05*0.50)
 	end
+	if drawtarget == 'welcome' then
+		love.graphics.setColor(Color('#ffffff'))
+		love.graphics.draw(lmb_img, 30, 30, 0, 0.04, 0.04, 250, 250)
+		love.graphics.draw(rmb_img, 30, 55, 0, 0.04, 0.04, 250, 250)
+		love.graphics.setFont(header_font)
+		love.graphics.setColor(PLAYER_COLOR)
+		love.graphics.printf("JUMP", 50, 28, 100*20/0.75, "left", 0, 0.05*0.50)
+		love.graphics.setColor(MANA_COLOR)
+		love.graphics.printf("LEAVE", 50, 53, 100*20/0.75, "left", 0, 0.05*0.50)
+	end
     for i, entity in ipairs(zoo) do
 		entity:draw()
 	end
@@ -413,8 +441,12 @@ function draw()
 	    love.graphics.setFont(numeric_font)
 	    love.graphics.setColor(Color('#ffffff', 0.2))
 	    love.graphics.printf(score, 100, 0, 300, 'left', 0, 0.2)
-	    -- love.graphics.setColor(Color('#39eafd', center_score_opacity))
-	    -- love.graphics.printf(score, 0, 20, 100/0.2, 'center', 0, 0.2)
+	    love.graphics.setColor(Color('#ffffff', center_score_opacity))
+		love.graphics.draw(lmb_img, 30, 30, 0, 0.04, 0.04, 250, 250)
+		love.graphics.draw(rmb_img, 30, 65, 0, 0.04, 0.04, 250, 250)
+		love.graphics.setFont(header_font)
+		love.graphics.printf("RESTART", 50, 28, 100*20/0.75, "left", 0, 0.05*0.50)
+		love.graphics.printf("LEAVE", 50, 63, 100*20/0.75, "left", 0, 0.05*0.50)
 	    love.graphics.push()
 	    bar_shack:apply()
 		    love.graphics.setColor(bar_color)
