@@ -16,7 +16,7 @@ MANA_COLOR = Color('#5ce1e6')
 ENEMY_COLOR = Color('#ff5757')
 PLAYER_COLOR = Color('#ffde59')
 BORDER_COLOR = Color('#ffffff')
-BACKGROUND_COLOR = Color('#000000')
+BACKGROUND_COLOR = Color('#040404')
 
 -- in-project extras
 utils = require 'utils'
@@ -64,6 +64,15 @@ main_menu:addArea({14, 54, 86, 66})
 main_menu:addArea({14, 67, 86, 79})
 	:onMouseEnter(function () flux.to(zoo[4], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[4], 0.1, {r=1.5}) end)
+	:onClick(function ()
+		gamestate = 's'
+		flux.to(zoo[4], 0.3, {r=1})
+			:ease('sineout')
+		flux.to(_G, 0.2, {game_transparency=1})
+			:ease('sineinout')
+			:after({}, 0.4, {})
+			:oncomplete(load_farewell)
+		end)
 
 -- global bariables
 --[[
@@ -161,6 +170,20 @@ function load_welcome()
 		:after(_G, 0.4, {game_transparency=1})
 		:after({}, 0.8, {})
 		:oncomplete(start_tutorial)
+end
+
+function load_farewell()
+	utils.stop_tweens()
+	drawtarget = 'farewell'
+	gamestate = 's'
+	zoo = {}
+	game_transparency = 1
+	flux.to(_G, 0.4, {game_transparency=0})
+		:ease('sineinout')
+		:after({}, 0.6, {})
+		:after(_G, 0.4, {game_transparency=1})
+		:after({}, 0.4, {})
+		:oncomplete(love.event.quit)
 end
 
 function load_credits()
@@ -426,10 +449,15 @@ function draw()
 		love.graphics.setColor(MANA_COLOR)
 		love.graphics.printf("LEAVE", 50, 53, 100*20/0.75, "left", 0, 0.05*0.50)
 	end
+	if drawtarget == 'farewell' then
+		love.graphics.setColor(Color('#ffffff'))
+		love.graphics.setFont(body_font)
+		love.graphics.printf("Good luck!", 14, 18, 100*20/0.75, "center", 0, 0.05*0.75)
+	end
     for i, entity in ipairs(zoo) do
 		entity:draw()
 	end
-	-- love.graphics.setColor(Color('#000000'))
+	-- love.graphics.setColor(Color('#040404'))
 	-- love.graphics.rectangle('fill', -1000, 0, 1000, 100)
 	-- love.graphics.rectangle('fill', 100, 0, 1000, 100)
 	-- love.graphics.rectangle('fill', -1000, -1000, 2000, 1000)
@@ -460,7 +488,7 @@ function draw()
 		love.graphics.setColor(Color('#ffffff'))
 		love.graphics.printf('swalrus', 0, 38, 100/0.04, "center", 0, 0.04)
 	end
-    love.graphics.setColor(Color('000000', game_transparency))
+    love.graphics.setColor(Color('#040404', game_transparency))
     love.graphics.rectangle('fill', -1000, -1000, 2000, 2000)
     center:finish()
 end
