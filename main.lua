@@ -9,7 +9,6 @@ Input = require "modules/Input"
 Color = require "modules/hex2color"
 tick = require "modules/tick"
 moonshine = require 'moonshine'
-main_menu = dofile "modules/hover.lua"
 
 -- constants
 MANA_COLOR = Color('#5ce1e6')
@@ -35,6 +34,7 @@ bar_shack:setDimensions(100, 100)
 
 tick.framerate = 60
 
+main_menu = dofile "modules/hover.lua"
 main_menu:addArea({14, 28, 86, 40})
 	:onMouseEnter(function () flux.to(zoo[1], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[1], 0.1, {r=1.5}) end)
@@ -50,6 +50,15 @@ main_menu:addArea({14, 28, 86, 40})
 main_menu:addArea({14, 41, 86, 53})
 	:onMouseEnter(function () flux.to(zoo[2], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[2], 0.1, {r=1.5}) end)
+	:onClick(function ()
+		gamestate = 's'
+		flux.to(zoo[2], 0.3, {r=1})
+			:ease('sineout')
+		flux.to(_G, 0.2, {game_transparency=1})
+			:ease('sineinout')
+			:after({}, 0, {})
+			:oncomplete(load_shelf)
+		end)
 main_menu:addArea({14, 54, 86, 66})
 	:onMouseEnter(function () flux.to(zoo[3], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[3], 0.1, {r=1.5}) end)
@@ -75,6 +84,49 @@ main_menu:addArea({14, 67, 86, 79})
 			:oncomplete(load_farewell)
 		end)
 
+shelf = dofile "modules/hover.lua"
+shelf:addArea({-20, 0, 20, 100})
+	:onClick(function ()
+		if shelf_index > 1 then
+			shelf_index = shelf_index - 1
+			flux.to(_G, 0.2, {shelf_bias=-60*shelf_index})
+				:ease('quadinout')
+		end
+	end)
+	:onMouseEnter(function ()
+		if shelf_index > 1 then
+			flux.to(_G, 0.1, {shelf_bias=-60*shelf_index+5})
+				:ease('quadinout')
+		end
+	end)
+	:onMouseLeave(function ()
+		flux.to(_G, 0.2, {shelf_bias=-60*shelf_index})
+			:ease('quadinout')
+	end)
+shelf:addArea({80, 0, 120, 100})
+	:onClick(function ()
+		if shelf_index < #music_data then
+			shelf_index = shelf_index + 1
+			flux.to(_G, 0.2, {shelf_bias=-60*shelf_index})
+				:ease('quadinout')
+		end
+	end)
+	:onMouseEnter(function ()
+		if shelf_index < #music_data then
+			flux.to(_G, 0.1, {shelf_bias=-60*shelf_index-5})
+				:ease('quadinout')
+		end
+	end)
+	:onMouseLeave(function ()
+		flux.to(_G, 0.2, {shelf_bias=-60*shelf_index})
+			:ease('quadinout')
+	end)
+shelf:addArea({20, 0, 80, 100})
+	:onClick(function ()
+		selected_track = music_data[shelf_index].path
+		selected_track_index = shelf_index
+	end)
+
 -- global bariables
 --[[
 gamestate: {
@@ -89,25 +141,11 @@ music_playing = false
 music = nil
 drawtarget = 'tutorial'
 zoo = {}
-
 selected_track = 'sb_neon.mp3'
-music_data = {
-	{
-		name = 'Neon',
-		path = 'sb_neon.mp3',
-		unlock_score = 0
-	},
-	{
-		name = 'Neon',
-		path = 'sb_neon.mp3',
-		unlock_score = 0
-	},
-	{
-		name = 'Neon',
-		path = 'sb_neon.mp3',
-		unlock_score = 0
-	}
-}
+selected_track_index = 1
+shelf_index = 1
+shelf_bias = -60
+
 
 function love.load(arg)
     input = Input()
@@ -123,10 +161,44 @@ function love.load(arg)
     rmb_img = love.graphics.newImage("2.png")
     mouse_img = love.graphics.newImage("3.png")
     love_logo = love.graphics.newImage("love.jpg")
+    gradient = love.graphics.newImage("gradient.png")
     shader = moonshine(moonshine.effects.vignette)
     active = true
     played_indicator = false
     timescale_tween = nil
+
+    music_data = {
+	{
+		name = 'Neon',
+		path = 'sb_neon.mp3',
+		unlock_score = 0,
+		cover = love.graphics.newImage('cover_neon.jpg')
+	},
+	{
+		name = 'Utopia',
+		path = 'sb_utopia.mp3',
+		unlock_score = 0,
+		cover = love.graphics.newImage('Utopia-wide-700x329.jpg')
+	},
+	{
+		name = 'Vengeance',
+		path = 'sb_vengeance.mp3',
+		unlock_score = 0,
+		cover = love.graphics.newImage('Vengeance-wide-01-700x329.jpg')
+	},
+	{
+		name = 'Sanctum',
+		path = 'sb_sanctum.mp3',
+		unlock_score = 0,
+		cover = love.graphics.newImage('Sanctum-wide-01-700x329.jpg')
+	},
+	{
+		name = 'Machinery of the Stars',
+		path = 'sb_machineryofthestars.mp3',
+		unlock_score = 0,
+		cover = love.graphics.newImage('Machinery-of-the-Stars-wide-01-700x329.jpg')
+	}
+}
 
     -- game_transparency = 1
     -- flux.to(_G, 0.4, {game_transparency=0})
@@ -153,8 +225,9 @@ function love.update(dt)
 
 	if not (gamestate == 's') then
 		if drawtarget == 'menu' then main_menu:update(center:toGame(love.mouse.getPosition())) end
+		if drawtarget == 'shelf' then shelf:update(center:toGame(love.mouse.getPosition())) end
 
-		if drawtarget == 'credits' and input:pressed('back') then
+		if (drawtarget == 'credits' or drawtarget == 'shelf') and input:pressed('back') then
 			gamestate = 's'
 			flux.to(_G, 0.2, {game_transparency=1})
 				:ease('sineinout')
@@ -254,6 +327,31 @@ function draw()
 		love.graphics.setColor(Color('#ffffff'))
 		love.graphics.setFont(body_font)
 		love.graphics.printf("Good luck!", 14, 18, 100*20/0.75, "center", 0, 0.05*0.75)
+	end
+	if drawtarget == 'shelf' then
+		love.graphics.setColor(Color('#ffffff'))
+		for i, track in ipairs(music_data) do
+			love.graphics.setColor(Color('#ffffff'))
+			love.graphics.draw(track.cover, 25 + 60 * i + shelf_bias, 15, 0, 50/track.cover:getWidth())
+			love.graphics.setFont(body_font)
+			love.graphics.setColor(Color('#ffffff', 0.8))
+			love.graphics.printf(track.name, 25 + 60 * i + shelf_bias, 70, 50*20/0.50, "center", 0, 0.05*0.50)
+			love.graphics.setColor(MANA_COLOR)
+			love.graphics.setFont(header_font)
+			if track.name == "Machinery of the Stars" then
+				love.graphics.printf("SCOTT BUCKLEY", 25 + 60 * i + shelf_bias, 88, 50*20/0.25, "center", 0, 0.05*0.25)
+			else
+				love.graphics.printf("SCOTT BUCKLEY", 25 + 60 * i + shelf_bias, 80, 50*20/0.25, "center", 0, 0.05*0.25)
+			end
+		end
+		love.graphics.setColor(PLAYER_COLOR)
+		love.graphics.setLineWidth(3)
+		love.graphics.rectangle('line', 26.5 + 60 * selected_track_index + shelf_bias, 16.5, 47, 47)
+		love.graphics.draw(gradient, 25, 0, 0, -25/gradient:getWidth(), 100/gradient:getHeight())
+		love.graphics.draw(gradient, 75, 0, 0, 25/gradient:getWidth(), 100/gradient:getHeight())
+		love.graphics.setColor(Color('#040404'))
+		love.graphics.rectangle('fill', -1000, 0, 1000, 100)
+		love.graphics.rectangle('fill', 100, 0, 1000, 100)
 	end
     for i, entity in ipairs(zoo) do
 		entity:draw()

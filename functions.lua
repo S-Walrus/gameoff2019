@@ -58,6 +58,15 @@ function load_farewell()
 		:oncomplete(love.event.quit)
 end
 
+function load_shelf()
+	utils.stop_tweens()
+	drawtarget = 'shelf'
+	gamestate = 'm'
+	zoo = {}
+	game_transparency = 1
+	flux.to(_G, 0.4, {game_transparency=0}):ease('sineinout')
+end
+
 function load_credits()
 	utils.stop_tweens()
 	drawtarget = 'credits'
@@ -69,6 +78,10 @@ end
 
 function load_menu()
 	utils.stop_tweens()
+	if music_playing then
+		music_playing = false
+		music:stop()
+	end
 	drawtarget = 'menu'
 	gamestate = 'm'
 	zoo = {}
