@@ -89,6 +89,8 @@ function Blob:draw()
 	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 4)
 end
 function Blob:activate()
+	fail_sound:stop()
+	fail_sound:play()
 	slowmode = false
 	set_timescale(1)
 	active = false
@@ -104,6 +106,8 @@ end
 Coin = Body:extend()
 Coin.radius = 2
 function Coin:activate()
+	mana_sound:stop()
+	mana_sound:play()
 	score = score + 1
 	mana = math.min(max_mana, mana+40)
 	played_indicator = false

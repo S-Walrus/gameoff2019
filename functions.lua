@@ -14,6 +14,7 @@ function start_tutorial()
 	drawtarget = 'tutorial'
 	center_score_opacity = 0
 	set_timescale(1)
+	play_first = true
 
 	player = Player(Vector(50, 50), Vector(0, 0))
 	zoo = {}
@@ -157,6 +158,11 @@ function set_timescale(x)
 end
 
 function jump_to_mouse()
+	if play_first == true then
+		play_first = false
+		enter_sound:stop()
+		enter_sound:play()
+	end
 	set_timescale(1)
 	slowmode = false
 	local x, y = love.mouse.getPosition()
@@ -210,6 +216,8 @@ end
 
 function touchBorder()
 	screen:setShake(1)
+	bump_sound:stop()
+	bump_sound:play()
 	if drawtarget == 'tutorial' then
 		drawtarget = 'field'
 		flux.to({}, 1, {})

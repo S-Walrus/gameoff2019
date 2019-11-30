@@ -39,6 +39,8 @@ main_menu:addArea({14, 28, 86, 40})
 	:onMouseEnter(function () flux.to(zoo[1], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[1], 0.1, {r=1.5}) end)
 	:onClick(function ()
+		enter_sound:stop()
+		enter_sound:play()
 		gamestate = 's'
 		flux.to(zoo[1], 0.6, {r=100})
 			:ease('circinout')
@@ -51,6 +53,8 @@ main_menu:addArea({14, 41, 86, 53})
 	:onMouseEnter(function () flux.to(zoo[2], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[2], 0.1, {r=1.5}) end)
 	:onClick(function ()
+		enter_sound:stop()
+		enter_sound:play()
 		gamestate = 's'
 		flux.to(zoo[2], 0.3, {r=1})
 			:ease('sineout')
@@ -63,6 +67,8 @@ main_menu:addArea({14, 54, 86, 66})
 	:onMouseEnter(function () flux.to(zoo[3], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[3], 0.1, {r=1.5}) end)
 	:onClick(function ()
+		enter_sound:stop()
+		enter_sound:play()
 		gamestate = 's'
 		flux.to(zoo[3], 0.3, {r=1})
 			:ease('sineout')
@@ -75,6 +81,8 @@ main_menu:addArea({14, 67, 86, 79})
 	:onMouseEnter(function () flux.to(zoo[4], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[4], 0.1, {r=1.5}) end)
 	:onClick(function ()
+		enter_sound:stop()
+		enter_sound:play()
 		gamestate = 's'
 		flux.to(zoo[4], 0.3, {r=1})
 			:ease('sineout')
@@ -123,6 +131,8 @@ shelf:addArea({80, 0, 120, 100})
 	end)
 shelf:addArea({20, 0, 80, 100})
 	:onClick(function ()
+		mana_sound:stop()
+		mana_sound:play()
 		selected_track = music_data[shelf_index].path
 		selected_track_index = shelf_index
 	end)
@@ -141,7 +151,7 @@ music_playing = false
 music = nil
 drawtarget = 'tutorial'
 zoo = {}
-selected_track = 'sb_neon.mp3'
+selected_track = 'sb_utopia.mp3'
 selected_track_index = 1
 shelf_index = 1
 shelf_bias = -60
@@ -162,6 +172,13 @@ function love.load(arg)
     mouse_img = love.graphics.newImage("3.png")
     love_logo = love.graphics.newImage("love.jpg")
     gradient = love.graphics.newImage("gradient.png")
+    enter_sound = love.audio.newSource("res/synth-cut-032_A_minor.wav", "static")
+    leave_sound = love.audio.newSource("res/bellcrush_E_minor.wav", "static")
+    mana_sound = love.audio.newSource("res/fingersnap_G#_major.wav", "static")
+    bump_sound = love.audio.newSource("res/digital-distorted-kick_A_minor.wav", "static")
+    bump_sound:setVolume(0.5)
+    fail_sound = love.audio.newSource("res/strong-keys_F#_major.wav", "static")
+    push_sound = love.audio.newSource("res/rock-kick-soft-1.wav", "static")
     shader = moonshine(moonshine.effects.vignette)
     active = true
     played_indicator = false
@@ -228,12 +245,16 @@ function love.update(dt)
 		if drawtarget == 'shelf' then shelf:update(center:toGame(love.mouse.getPosition())) end
 
 		if (drawtarget == 'credits' or drawtarget == 'shelf') and input:pressed('back') then
+			leave_sound:stop()
+			leave_sound:play()
 			gamestate = 's'
 			flux.to(_G, 0.2, {game_transparency=1})
 				:ease('sineinout')
 				:oncomplete(load_menu)
 		end
 		if gamestate == 'r' and input:pressed('back') then
+			leave_sound:stop()
+			leave_sound:play()
 			gamestate = 's'
 			flux.to(_G, 0.2, {game_transparency=1})
 				:ease('sineinout')
