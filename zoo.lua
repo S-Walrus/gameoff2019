@@ -111,7 +111,7 @@ function Coin:activate()
 	score = score + 1
 	mana = math.min(max_mana, mana+40)
 	played_indicator = false
-	bar_color = MANA_COLOR
+	bar_color = Color('#5ce1e6')
 	utils.remove(zoo, self)
 	local circle = Circle(self.pos, self.r, Color('#5ce1e6'), 'line', 0.5, 1)
 	table.insert(zoo, circle)

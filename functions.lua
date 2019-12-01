@@ -9,7 +9,7 @@ function start_tutorial()
 	manacostpersec = 160
 	score = 0
 	active = true
-	bar_color = MANA_COLOR
+	bar_color = Color('#5ce1e6')
 	gamestate = 's'
 	drawtarget = 'tutorial'
 	center_score_opacity = 0
@@ -105,7 +105,7 @@ function start_new_game()
 	manacostpersec = 160
 	score = 0
 	active = true
-	bar_color = MANA_COLOR
+	bar_color = Color('#5ce1e6')
 	gamestate = 's'
 	drawtarget = 'field'
 	center_score_opacity = 0
@@ -179,7 +179,7 @@ end
 function break_mana()
     bar_shack:setShake(2)
     indicate_bar(Color('#ff5757'), 0.2)
-    -- bar_color = MANA_COLOR
+    -- bar_color = Color('#5ce1e6')
 	max_mana = max_mana - jumpmanacost
 	bar_width = max_mana
 	mana = max_mana
@@ -192,7 +192,7 @@ function indicate_bar(color, interval, count)
 		if n == 0 then return end
 		bar_color = color
 		flux.to({}, interval, {}):delay(interval)
-			:onstart(function () bar_color = MANA_COLOR end)
+			:onstart(function () bar_color = Color('#5ce1e6') end)
 			:oncomplete(function () change_color(color, interval, n - 1) end)
 	end
 	change_color(color, interval, count or 4)
@@ -222,7 +222,7 @@ function touchBorder()
 		drawtarget = 'field'
 		flux.to({}, 1, {})
 			:oncomplete(function ()
-				local circle = Circle(Vector(50, 50), 2, PLAYER_COLOR, 'line', 0.5, 1)
+				local circle = Circle(Vector(50, 50), 2, Color('#ffde59'), 'line', 0.5, 1)
 				table.insert(zoo, circle)
 				local tmp = {}
 				flux.to(circle, 0.8, {r = 6, opacity = 0})

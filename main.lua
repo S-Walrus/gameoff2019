@@ -185,17 +185,17 @@ function love.load(arg)
     timescale_tween = nil
 
     music_data = {
+    {
+		name = 'Utopia',
+		path = 'sb_utopia.mp3',
+		unlock_score = 0,
+		cover = love.graphics.newImage('Utopia-wide-700x329.jpg')
+	},
 	{
 		name = 'Neon',
 		path = 'sb_neon.mp3',
 		unlock_score = 0,
 		cover = love.graphics.newImage('cover_neon.jpg')
-	},
-	{
-		name = 'Utopia',
-		path = 'sb_utopia.mp3',
-		unlock_score = 0,
-		cover = love.graphics.newImage('Utopia-wide-700x329.jpg')
 	},
 	{
 		name = 'Vengeance',
@@ -286,7 +286,7 @@ function love.update(dt)
 
 		if mana <= 2 * jumpmanacost and not played_indicator then
 			-- indicate_bar(Color('#ff5757'), 0.1, 3)
-			bar_color = ENEMY_COLOR
+			bar_color = Color('#ff5757')
 			played_indicator = true
 		end
 
@@ -339,9 +339,9 @@ function draw()
 		love.graphics.draw(lmb_img, 30, 30, 0, 0.04, 0.04, 250, 250)
 		love.graphics.draw(rmb_img, 30, 55, 0, 0.04, 0.04, 250, 250)
 		love.graphics.setFont(header_font)
-		love.graphics.setColor(PLAYER_COLOR)
+		love.graphics.setColor(Color('#ffde59'))
 		love.graphics.printf("JUMP", 50, 28, 100*20/0.75, "left", 0, 0.05*0.50)
-		love.graphics.setColor(MANA_COLOR)
+		love.graphics.setColor(Color('#5ce1e6'))
 		love.graphics.printf("LEAVE", 50, 53, 100*20/0.75, "left", 0, 0.05*0.50)
 	end
 	if drawtarget == 'farewell' then
@@ -357,7 +357,7 @@ function draw()
 			love.graphics.setFont(body_font)
 			love.graphics.setColor(Color('#ffffff', 0.8))
 			love.graphics.printf(track.name, 25 + 60 * i + shelf_bias, 70, 50*20/0.50, "center", 0, 0.05*0.50)
-			love.graphics.setColor(MANA_COLOR)
+			love.graphics.setColor(Color('#5ce1e6'))
 			love.graphics.setFont(header_font)
 			if track.name == "Machinery of the Stars" then
 				love.graphics.printf("SCOTT BUCKLEY", 25 + 60 * i + shelf_bias, 88, 50*20/0.25, "center", 0, 0.05*0.25)
@@ -365,7 +365,7 @@ function draw()
 				love.graphics.printf("SCOTT BUCKLEY", 25 + 60 * i + shelf_bias, 80, 50*20/0.25, "center", 0, 0.05*0.25)
 			end
 		end
-		love.graphics.setColor(PLAYER_COLOR)
+		love.graphics.setColor(Color('#ffde59'))
 		love.graphics.setLineWidth(3)
 		love.graphics.rectangle('line', 26.5 + 60 * selected_track_index + shelf_bias, 16.5, 47, 47)
 		love.graphics.draw(gradient, 25, 0, 0, -25/gradient:getWidth(), 100/gradient:getHeight())
