@@ -1,5 +1,6 @@
 function start_tutorial()
 	utils.stop_tweens()
+	set_timescale(1)
 
 	slowmode = false
 	bar_width = 100
@@ -33,6 +34,7 @@ end
 
 function load_welcome()
 	utils.stop_tweens()
+	set_timescale(1)
 	drawtarget = 'welcome'
 	gamestate = 'm'
 	zoo = {}
@@ -47,6 +49,7 @@ end
 
 function load_farewell()
 	utils.stop_tweens()
+	set_timescale(1)
 	drawtarget = 'farewell'
 	gamestate = 's'
 	zoo = {}
@@ -61,6 +64,7 @@ end
 
 function load_shelf()
 	utils.stop_tweens()
+	set_timescale(1)
 	drawtarget = 'shelf'
 	gamestate = 'm'
 	zoo = {}
@@ -70,6 +74,7 @@ end
 
 function load_credits()
 	utils.stop_tweens()
+	set_timescale(1)
 	drawtarget = 'credits'
 	gamestate = 'm'
 	zoo = {}
@@ -79,6 +84,7 @@ end
 
 function load_menu()
 	utils.stop_tweens()
+	set_timescale(1)
 	if music_playing then
 		music_playing = false
 		music:stop()
@@ -96,6 +102,7 @@ end
 
 function start_new_game()
 	utils.stop_tweens()
+	set_timescale(1)
 
 	slowmode = false
 	bar_width = 100

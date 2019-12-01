@@ -89,6 +89,7 @@ function Blob:draw()
 	love.graphics.circle('fill', self.lastpos.x, self.lastpos.y, 4)
 end
 function Blob:activate()
+	gamestate = 's'
 	fail_sound:stop()
 	fail_sound:play()
 	slowmode = false
@@ -99,6 +100,7 @@ function Blob:activate()
 	flux.to(filler, 0.6, {r=80})
 		:ease('circinout')
 		:after(_G, 0.2, {center_score_opacity=1})
+		:oncomplete(function () gamestate='r' end)
 		:ease('sineinout')
 		:after(_G, 0.2, {center_score_opacity=1})
 end
