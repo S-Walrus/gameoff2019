@@ -31,8 +31,6 @@ center:apply()
 screen:setDimensions(100, 100)
 bar_shack:setDimensions(100, 100)
 
-tick.framerate = 60
-
 main_menu = require "modules/hover"
 main_menu:addArea({14, 28, 86, 40})
 	:onMouseEnter(function () flux.to(zoo[1], 0.1, {r=3}) end)
@@ -242,6 +240,7 @@ end
 
 
 function love.update(dt)
+	-- if tick.dt > 0.03 then tick.dt = 0.03 end
 	screen:update(tick.dt)
 	bar_shack:update(tick.dt*2)
 	flux.update(tick.dt)
