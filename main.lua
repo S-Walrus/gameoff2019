@@ -1,14 +1,13 @@
 -- import
 Object = require "modules/classic"
 screen = require "modules/shack"
-bar_shack = dofile "modules/shack.lua"
+bar_shack = require "modules/shack1"
 flux = require "modules/flux"
 center = require "modules/center"
 Vector = require "modules/brinevector"
 Input = require "modules/Input"
 Color = require "modules/hex2color"
 tick = require "modules/tick"
-moonshine = require 'moonshine'
 
 -- constants
 MANA_COLOR = Color('#5ce1e6')
@@ -34,7 +33,7 @@ bar_shack:setDimensions(100, 100)
 
 tick.framerate = 60
 
-main_menu = dofile "modules/hover.lua"
+main_menu = require "modules/hover"
 main_menu:addArea({14, 28, 86, 40})
 	:onMouseEnter(function () flux.to(zoo[1], 0.1, {r=3}) end)
 	:onMouseLeave(function () flux.to(zoo[1], 0.1, {r=1.5}) end)
@@ -92,7 +91,7 @@ main_menu:addArea({14, 67, 86, 79})
 			:oncomplete(load_farewell)
 		end)
 
-shelf = dofile "modules/hover.lua"
+shelf = require "modules/hover1"
 shelf:addArea({-20, 0, 20, 100})
 	:onClick(function ()
 		if shelf_index > 1 then
@@ -151,10 +150,10 @@ music_playing = false
 music = nil
 drawtarget = 'tutorial'
 zoo = {}
-selected_track = 'sb_utopia.mp3'
-selected_track_index = 1
-shelf_index = 1
-shelf_bias = -60
+selected_track = 'sb_vengeance.mp3'
+selected_track_index = 4
+shelf_index = 2
+shelf_bias = -120
 
 
 function love.load(arg)
@@ -175,16 +174,23 @@ function love.load(arg)
     enter_sound = love.audio.newSource("res/synth-cut-032_A_minor.wav", "static")
     leave_sound = love.audio.newSource("res/bellcrush_E_minor.wav", "static")
     mana_sound = love.audio.newSource("res/fingersnap_G#_major.wav", "static")
+    mana_sound:setVolume(0.8)
     bump_sound = love.audio.newSource("res/digital-distorted-kick_A_minor.wav", "static")
-    bump_sound:setVolume(0.5)
+    bump_sound:setVolume(0.3)
     fail_sound = love.audio.newSource("res/strong-keys_F#_major.wav", "static")
+    fail_sound:setVolume(0.2)
     push_sound = love.audio.newSource("res/rock-kick-soft-1.wav", "static")
-    shader = moonshine(moonshine.effects.vignette)
     active = true
     played_indicator = false
     timescale_tween = nil
 
     music_data = {
+    {
+		name = 'Silence',
+		path = nil,
+		unlock_score = 0,
+		cover = love.graphics.newImage('cover_placeholder.png')
+	},
     {
 		name = 'Utopia',
 		path = 'sb_utopia.mp3',
@@ -347,7 +353,7 @@ function draw()
 	if drawtarget == 'farewell' then
 		love.graphics.setColor(Color('#ffffff'))
 		love.graphics.setFont(body_font)
-		love.graphics.printf("Good luck!", 14, 18, 100*20/0.75, "center", 0, 0.05*0.75)
+		love.graphics.printf("Good luck!", 0, 18, 100*20/0.75, "center", 0, 0.05*0.75)
 	end
 	if drawtarget == 'shelf' then
 		love.graphics.setColor(Color('#ffffff'))
@@ -361,6 +367,8 @@ function draw()
 			love.graphics.setFont(header_font)
 			if track.name == "Machinery of the Stars" then
 				love.graphics.printf("SCOTT BUCKLEY", 25 + 60 * i + shelf_bias, 88, 50*20/0.25, "center", 0, 0.05*0.25)
+			elseif track.name == "Silence" then
+				love.graphics.printf("Nobody", 25 + 60 * i + shelf_bias, 80, 50*20/0.25, "center", 0, 0.05*0.25)
 			else
 				love.graphics.printf("SCOTT BUCKLEY", 25 + 60 * i + shelf_bias, 80, 50*20/0.25, "center", 0, 0.05*0.25)
 			end
@@ -414,11 +422,9 @@ function draw()
 end
 
 function love.draw()
-	-- shader(draw)
 	draw()
 end
 
 function love.resize(x, y)
 	center:resize(x, y)
-	shader.resize(x, y)
 end

@@ -39,7 +39,8 @@ function load_welcome()
 	gamestate = 'm'
 	zoo = {}
 	game_transparency = 1
-	flux.to(_G, 0.4, {game_transparency=0})
+	flux.to({}, 0.4, {})
+		:after(_G, 0.6, {game_transparency=0})
 		:ease('sineinout')
 		:after({}, 1, {})
 		:after(_G, 0.4, {game_transparency=1})
@@ -149,7 +150,7 @@ function start_new_game()
 			gamestate = 'r'
 		end)
 
-	if not music_playing then
+	if (not music_playing) and selected_track then
 		music = love.audio.newSource(selected_track, "stream")
 		music:setLooping(true)
 		music:play()
